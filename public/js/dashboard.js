@@ -10993,6 +10993,8 @@ var __webpack_exports__ = {};
 /*!***********************************!*\
   !*** ./resources/js/dashboard.js ***!
   \***********************************/
+window.$ = window.jQuery = window.jquery = __webpack_require__(/*! jquery */ "./node_modules/jquery/dist/jquery.js");
+
 __webpack_require__(/*! overlayscrollbars/js/jquery.overlayScrollbars.min */ "./node_modules/overlayscrollbars/js/jquery.overlayScrollbars.min.js");
 
 __webpack_require__(/*! admin-lte */ "./node_modules/admin-lte/dist/js/adminlte.min.js");

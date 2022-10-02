@@ -8,9 +8,10 @@ use Livewire\Component;
 
 class ListJenisDocument extends Component
 {
-    public $jenis_dokumen, $jenisDokumenModel;
+    public $jenis_dokumen, $jenisDokumenModel, $jenisDokumenId;
     public $hak_akses = [];
     public $openJenisDocumentModal = false;
+    public $openDeleteJenisDocumentModal = false;
     public $isEditing = false;
 
     protected $rules = [
@@ -30,12 +31,13 @@ class ListJenisDocument extends Component
 
     public function resetInput()
     {
+        $this->jenisDokumenId = "";
         $this->jenis_dokumen = "";
         $this->hak_akses = [];
         $this->openJenisDocumentModal = false;
+        $this->openDeleteJenisDocumentModal = false;
         $this->isEditing = false;
         $this->jenisDokumenModel = "";
-        $this->dispatchBrowserEvent('reset-form');
     }
 
     public function closeJenisDocumentModal()
@@ -45,10 +47,35 @@ class ListJenisDocument extends Component
         $this->hak_akses = [];
     }
 
+    public function closeDeleteJenisDocumentModal()
+    {
+        $this->jenisDokumenId = "";
+        $this->jenis_dokumen = "";
+        $this->openDeleteJenisDocumentModal = false;
+    }
+
     public function createJenisDocumentModal()
     {
         $this->openJenisDocumentModal = true;
         $this->isEditing = false;
+    }
+
+    public function deleteJenisDocumentModal(JenisDokumen $jenis_dokumen)
+    {
+        $this->jenisDokumenId = $jenis_dokumen->id;
+        $this->jenis_dokumen = $jenis_dokumen->jenis_dokumen;
+        $this->openDeleteJenisDocumentModal = true;
+        $this->isEditing = false;
+    }
+
+    public function deleteJenisDocument()
+    {
+        $jenis_dokumen = JenisDokumen::find($this->jenisDokumenId);
+        $this->jenis_dokumen = $jenis_dokumen->jenis_dokumen;
+        $jenis_dokumen->delete();
+
+        session()->flash('message', "Jenis Dokumen '{$jenis_dokumen->jenis_dokumen}' berhasil Dihapus ! !");
+        $this->resetInput();
     }
 
     public function createJenisDocument()

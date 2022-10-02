@@ -20,8 +20,9 @@
     @livewireStyles
 
     <!-- Scripts -->
+    {{-- <script src="{{ asset('assets/plugins/jquery/jquery.min.js') }}"></script> --}}
     <script src="{{ mix('js/app.js') }}" defer></script>
-    <script src="{{ mix('js/dashboard.js') }}" defer></script>
+    <script src="{{ mix('js/dashboard.js') }}"></script>
 </head>
 
 <body class="hold-transition sidebar-mini">
@@ -148,9 +149,7 @@
         </footer>
     </div>
     <!-- jQuery -->
-    <script src="{{ asset('assets/plugins/jquery/jquery.min.js') }}"></script>
-    <!-- Bootstrap 4 -->
-    <script src="{{ asset('assets/plugins/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+    {{-- <script src="{{ asset('assets/plugins/jquery/jquery.min.js') }}"></script> --}}
     <!-- Select2 -->
     <script src="{{ asset('assets/plugins/select2/js/select2.full.min.js') }}"></script>
     @stack('modals')

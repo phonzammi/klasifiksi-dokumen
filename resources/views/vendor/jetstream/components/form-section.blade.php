@@ -15,7 +15,7 @@
         <div class="card shadow-sm">
             <form wire:submit.prevent="{{ $submit }}">
                 <div class="card-body">
-                {{ $form }}
+                    {{ $form }}
                 </div>
 
                 @if (isset($actions))

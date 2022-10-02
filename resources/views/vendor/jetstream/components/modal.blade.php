@@ -42,16 +42,19 @@ $maxWidth = [
         show = false
     })
 
-    modal.click(function(e) {
-        if (e.target == this) {
-            show = false;
-        }
-    });
+
 }" x-on:keydown.escape.window="show = false"
     x-on:keydown.tab.prevent="$event.shiftKey || nextFocusable().focus()"
     x-on:keydown.shift.tab.prevent="prevFocusable().focus()" wire:ignore.self class="modal fade" id="{{ $id }}"
-    aria-labelledby="{{ $id }}" aria-hidden="true" x-ref="{{ $id }}">
+    aria-labelledby="{{ $id }}" aria-hidden="true" x-ref="{{ $id }}" data-backdrop="static"
+    data-keyboard="false" tabindex="-1">
     <div class="modal-dialog{{ $maxWidth }}">
         {{ $slot }}
     </div>
 </div>
+
+{{-- modal.click(function(e) {
+        if (e.target == this) {
+            show = false;
+        }
+    }); --}}
