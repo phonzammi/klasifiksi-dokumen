@@ -18,7 +18,7 @@ use App\Http\Livewire\Admin\Users\ListUsers;
 */
 
 Route::get('/', function () {
-    return view('welcome');
+    return view('users/home');
 });
 
 Route::middleware([
