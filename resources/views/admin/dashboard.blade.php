@@ -14,7 +14,7 @@
     <div class="container-fluid">
         <div class="row">
             <div class="col">
-                <x-jet-welcome />
+
             </div>
         </div>
     </div>
