@@ -20,10 +20,11 @@ class CreateDokumenTable extends Migration
                 ->constrained('jenis_dokumen')
                 ->onUpdate('cascade')
                 ->onDelete('cascade');
-            $table->foreignId('uploaded_by')
+            $table->foreignId('user_id')
                 ->constrained('users')
                 ->onUpdate('cascade')
                 ->onDelete('cascade');
+            $table->string('lampiran');
             $table->timestamps();
         });
     }

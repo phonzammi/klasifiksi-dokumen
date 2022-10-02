@@ -18,12 +18,6 @@ class ListJenisDocument extends Component
         'hak_akses' => 'nullable',
     ];
 
-    protected $messages = [
-        'required' => ':attribute Tidak Boleh Kosong !.',
-        'unique' => ':attribute Sudah Pernah Terdaftar !',
-
-    ];
-
     protected $validationAttributes = [
         'jenis_dokumen' => 'Jenis Dokumen',
         'hak_akses' => 'Hak Akses'
@@ -41,6 +35,7 @@ class ListJenisDocument extends Component
         $this->openJenisDocumentModal = false;
         $this->isEditing = false;
         $this->jenisDokumenModel = "";
+        $this->dispatchBrowserEvent('reset-form');
     }
 
     public function closeJenisDocumentModal()
@@ -61,9 +56,7 @@ class ListJenisDocument extends Component
         $validatedData = $this->validate();
         $jenis_dokumen_baru = JenisDokumen::create($validatedData);
         if (count($this->hak_akses) > 0) {
-            // foreach ($this->hak_akses as $hak_akses) {
             $jenis_dokumen_baru->roles()->attach($this->hak_akses);
-            // }
         }
 
         session()->flash('message', "Jenis Dokumen Baru Berhasil Ditambahkan !");
@@ -72,7 +65,6 @@ class ListJenisDocument extends Component
 
     public function editJenisDocumentModal(JenisDokumen $jenis_dokumen)
     {
-
         $this->openJenisDocumentModal = true;
         $this->isEditing = true;
 

@@ -60,7 +60,8 @@
                                                 @endforelse
                                             </td>
                                             <td>
-                                                <a href="#" wire:click='editJenisDocumentModal({{ $jenis_dokumen }})'>
+                                                <a href="#"
+                                                    wire:click='editJenisDocumentModal({{ $jenis_dokumen }})'>
                                                     <i class="far fa-edit mr-1"></i>
                                                 </a>
                                                 <a href="#">
@@ -101,32 +102,34 @@
         </x-slot>
 
         <x-slot name="content">
+            <form id="jenisDocument">
 
-            <div class="form-group">
-                <x-jet-label for="jenis_dokumen">Jenis Dokumen</x-jet-label>
+                <div class="form-group">
+                    <x-jet-label for="jenis_dokumen">Jenis Dokumen</x-jet-label>
 
-                <x-jet-input type='text' placeholder="{{ __('Jenis Dokumen') }}"
-                    class="{{ $errors->has('jenis_dokumen') ? 'is-invalid' : '' }}"
-                    wire:model.debounce.500ms="jenis_dokumen" wire:keydown.enter="createJenisDocument" />
+                    <x-jet-input type='text' placeholder="{{ __('Jenis Dokumen') }}"
+                        class="{{ $errors->has('jenis_dokumen') ? 'is-invalid' : '' }}"
+                        wire:model.debounce.500ms="jenis_dokumen" wire:keydown.enter="createJenisDocument" />
 
-                <x-jet-input-error for="jenis_dokumen" class="mt-2" />
-            </div>
+                    <x-jet-input-error for="jenis_dokumen" class="mt-2" />
+                </div>
 
-            <div wire:ignore class="form-group">
-                <x-jet-label for="role_id">Hak Akses</x-jet-label>
+                <div wire:ignore class="form-group">
+                    <x-jet-label for="role_id">Hak Akses</x-jet-label>
 
-                <select id="role_id" wire:model='hak_akses'
-                    class="select2 form-control @error('role_id') is-invalid @enderror" multiple="multiple"
-                    style="width: 100%;">
-                    @foreach ($roles as $hakAkses)
-                        <option value="{{ $hakAkses->id }}">
-                            {{ $hakAkses->role_name }}
-                        </option>
-                    @endforeach
-                </select>
+                    <select id="role_id" wire:model='hak_akses'
+                        class="select2 form-control @error('role_id') is-invalid @enderror" multiple="multiple"
+                        style="width: 100%;">
+                        @foreach ($roles as $hakAkses)
+                            <option value="{{ $hakAkses->id }}">
+                                {{ $hakAkses->role_name }}
+                            </option>
+                        @endforeach
+                    </select>
 
-                <x-jet-input-error for="role_id" class="mt-2" />
-            </div>
+                    <x-jet-input-error for="role_id" class="mt-2" />
+                </div>
+            </form>
 
         </x-slot>
 
@@ -147,17 +150,19 @@
             </button>
         </x-slot>
 
-
     </x-jet-dialog-modal>
 </div>
 @push('scripts')
     <script>
-        $('.select2').select2({
+        $('#role_id').select2({
             placeholder: 'Pilih Hak Akses',
             allowClear: true
         }).on('change', function() {
             @this.set('hak_akses', $(this).val());
         });
 
+        window.addEventListener('reset-form', event => {
+            $('#role_id').val(null).trigger('change');
+        })
     </script>
 @endpush

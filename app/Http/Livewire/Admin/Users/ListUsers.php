@@ -19,15 +19,6 @@ class ListUsers extends Component
         'role_id' => 'nullable',
     ];
 
-    protected $messages = [
-        'required' => ':attribute Tidak Boleh Kosong !.',
-        'email' => ':attribute Harus Berformat Email !',
-        'unique' => ':attribute Sudah Pernah Terdaftar !',
-        'password_confirmation.same' => ':attribute Tidak Cocok !',
-        'min' => "Minimal :attribute :min Karakter !",
-        'numeric' => ':attribute Harus Berformat Angka !'
-    ];
-
     protected $validationAttributes = [
         'nim_nip' => 'NIM atau NIP',
         'name' => 'Nama Lengkap',

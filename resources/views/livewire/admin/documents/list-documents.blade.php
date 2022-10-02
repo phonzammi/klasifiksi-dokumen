@@ -23,7 +23,7 @@
         <div class="row">
             <div class="col-lg-12">
                 <div class="d-flex justify-content-end mb-1">
-                    <button wire:click="uploadDocumentModal" class="btn btn-primary mr-1" wire:loading.attr="disabled">
+                    <button wire:click="createDocumentModal" class="btn btn-primary mr-1" wire:loading.attr="disabled">
                         <i class="fas fa-file-upload"></i>
                         Unggah Dokumen
                     </button>
@@ -36,7 +36,7 @@
                                     <tr>
                                         <th scope="col">No.</th>
                                         <th scope="col">Nama Dokumen</th>
-                                        <th scope="col">Tipe Dokumen</th>
+                                        <th scope="col">Jenis Dokumen</th>
                                         <th scope="col">Diunggah Oleh</th>
                                         <th scope="col">#Aksi</th>
                                     </tr>
@@ -44,7 +44,25 @@
                                 <tbody>
 
 
-                                    {{-- @endforelse --}}
+                                    @forelse ($semua_dokumen as $dokumen)
+                                        <tr>
+                                            <th scope="row">{{ $loop->iteration }}</th>
+                                            <td>{{ $dokumen->nama_dokumen }}</td>
+                                            <td>{{ $dokumen->jenis_dokumen->jenis_dokumen }}</td>
+                                            <td>{{ $dokumen->uploaded_by->name }}
+                                                ({{ $dokumen->uploaded_by->is_admin ? 'Admin' : '' }})
+                                            </td>
+                                            <td>
+                                                <a href="#">
+                                                    <i class="far fa-edit mr-1"></i>
+                                                </a>
+                                                <a href="#">
+                                                    <i class="fas fa-trash text-danger"></i>
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    @empty
+                                    @endforelse
                                 </tbody>
                             </table>
 
@@ -67,40 +85,45 @@
         <x-slot name="content">
             {{ __('Silahkan isi form berikut.') }}
 
-            <div class="mt-3 w-md-75" x-data="{}"
-                x-on:open-upload-document-modal.window="setTimeout(() => $refs.nama_dokumen.focus(), 250)">
+            <div class="mt-3 w-md-75">
                 <x-jet-label for="nama_dokumen">
                     Nama Dokumen
                 </x-jet-label>
-                <x-jet-input type='text' placeholder="{{ __('Nama Dokumen') }}" x-ref="nama_dokumen"
+                <x-jet-input type='text' placeholder="{{ __('Nama Dokumen') }}"
                     class="{{ $errors->has('nama_dokumen') ? 'is-invalid' : '' }}" wire:model.defer="nama_dokumen"
-                    wire:keydown.enter="uploadDocument" />
+                    wire:keydown.enter="storeDocument" />
 
                 <x-jet-input-error for="nama_dokumen" class="mt-2" />
             </div>
 
-            <div class="mt-3 w-md-75" x-data="{}"
-                x-on:open-upload-document-modal.window="setTimeout(() => $refs.jenis_dokumen_id.focus(), 250)">
+            <div class="mt-3 w-md-75">
                 <x-jet-label for="jenis_dokumen_id">
                     Jenis Dokumen
                 </x-jet-label>
-                <x-jet-input type='text' placeholder="{{ __('Jenis Dokumen') }}" x-ref="jenis_dokumen_id"
-                    class="{{ $errors->has('jenis_dokumen_id') ? 'is-invalid' : '' }}"
-                    wire:model.defer="jenis_dokumen_id" wire:keydown.enter="uploadDocument" />
+                <select id="jenis_dokumen_id" wire:model.lazy="jenis_dokumen_id"
+                    class="custom-select {{ $errors->has('jenis_dokumen_id') ? 'is-invalid' : '' }}">
+                    <option value="">Pilih Jenis Dokumen ...</option>
+                    @foreach ($semua_jenis_dokumen as $jenis_dokumen)
+                        <option value="{{ $jenis_dokumen->id }}">{{ $jenis_dokumen->jenis_dokumen }}</option>
+                    @endforeach
+                </select>
 
                 <x-jet-input-error for="jenis_dokumen_id" class="mt-2" />
             </div>
 
-            <div class="mt-3 w-md-75" x-data="{}"
-                x-on:open-upload-document-modal.window="setTimeout(() => $refs.lampiran_dokumen.focus(), 250)">
-                <x-jet-label for="lampiran_dokumen">
-                    Pilih Dokumen
+            <div class="mt-3 w-md-75">
+                <x-jet-label for="lampiran">
+                    Pilih Lampiran
                 </x-jet-label>
-                <x-jet-input type='file' placeholder="{{ __('Pilih Dokumen') }}" x-ref="lampiran_dokumen"
-                    class="{{ $errors->has('lampiran_dokumen') ? 'is-invalid' : '' }}"
-                    wire:model.defer="lampiran_dokumen" wire:keydown.enter="uploadDocument" />
+                <div class="custom-file">
+                    {{-- <input type="file" class="custom-file-input" id="customFile"> --}}
+                    <x-jet-input type='file' wire:model.defer="lampiran" id="customFile"
+                        class="custom-file-input {{ $errors->has('lampiran') ? 'is-invalid' : '' }}" accept=".pdf" />
+                    <label class="custom-file-label"
+                        for="customFile">{{ $lampiran ? $lampiran->getClientOriginalName() : 'Pilih Lampiran' }}</label>
+                    <x-jet-input-error for="lampiran" class="mt-2" />
+                </div>
 
-                <x-jet-input-error for="lampiran_dokumen" class="mt-2" />
             </div>
 
         </x-slot>
@@ -110,11 +133,10 @@
                 {{ __('Batal') }}
             </button>
 
-            <button type="submit" class="btn btn-primary" wire:click="uploadDocument" wire:loading.attr="disabled">
+            <button type="submit" class="btn btn-primary" wire:click="storeDocument" wire:loading.attr="disabled">
                 {{ __('Unggah') }}
             </button>
         </x-slot>
-
 
     </x-jet-dialog-modal>
 </div>
