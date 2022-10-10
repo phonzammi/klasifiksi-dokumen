@@ -7,10 +7,14 @@ use App\Models\JenisDokumen;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 use Illuminate\Support\Str;
+use Livewire\WithPagination;
 
 class ListDocuments extends Component
 {
+    use WithPagination;
     use WithFileUploads;
+
+    protected $paginationTheme = 'bootstrap';
 
     public $nama_dokumen, $jenis_dokumen_id, $lampiran, $dokumenModel;
     public $openDocumentModal = false;
@@ -108,7 +112,7 @@ class ListDocuments extends Component
     public function render()
     {
         $semua_jenis_dokumen = JenisDokumen::all();
-        $semua_dokumen = Dokumen::with(['jenis_dokumen', 'uploaded_by'])->latest()->paginate();
+        $semua_dokumen = Dokumen::with(['jenis_dokumen', 'uploaded_by'])->latest()->paginate(5);
         return view('livewire.admin.documents.list-documents', compact('semua_jenis_dokumen', 'semua_dokumen'));
     }
 }

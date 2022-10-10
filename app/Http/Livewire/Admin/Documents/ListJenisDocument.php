@@ -5,9 +5,14 @@ namespace App\Http\Livewire\Admin\Documents;
 use App\Models\JenisDokumen;
 use App\Models\Role;
 use Livewire\Component;
+use Livewire\WithPagination;
 
 class ListJenisDocument extends Component
 {
+    use WithPagination;
+
+    protected $paginationTheme = 'bootstrap';
+
     public $jenis_dokumen, $jenisDokumenModel, $jenisDokumenId;
     public $hak_akses = [];
     public $openJenisDocumentModal = false;
@@ -117,7 +122,10 @@ class ListJenisDocument extends Component
     public function render()
     {
         $roles = Role::all();
-        $semua_jenis_dokumen = JenisDokumen::with('roles')->get();
-        return view('livewire.admin.documents.list-jenis-document', compact('roles', 'semua_jenis_dokumen'));
+        $semua_jenis_dokumen = JenisDokumen::with('roles')->paginate(10);
+        return view('livewire.admin.documents.list-jenis-document', [
+            'roles' => $roles,
+            'semua_jenis_dokumen' => $semua_jenis_dokumen
+        ]);
     }
 }

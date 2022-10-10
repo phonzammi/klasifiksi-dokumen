@@ -11,6 +11,6 @@ class Role extends Model
 
     protected $fillable = ['role_name'];
 
-    public const IS_DOSEN = 2;
+    public const IS_DOSEN = 1;
     public const IS_MAHASISWA = 2;
 }

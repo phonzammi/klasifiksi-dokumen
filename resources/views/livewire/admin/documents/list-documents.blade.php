@@ -42,11 +42,9 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-
-
-                                    @forelse ($semua_dokumen as $dokumen)
+                                    @forelse ($semua_dokumen as $index => $dokumen)
                                         <tr>
-                                            <th scope="row">{{ $loop->iteration }}</th>
+                                            <th scope="row">{{ $semua_dokumen->firstItem() + $index }}</th>
                                             <td>{{ $dokumen->nama_dokumen }}</td>
                                             <td>{{ $dokumen->jenis_dokumen->jenis_dokumen }}</td>
                                             <td>{{ $dokumen->uploaded_by->name }}
@@ -62,11 +60,18 @@
                                             </td>
                                         </tr>
                                     @empty
+                                        <tr>
+                                            <td colspan="5" class="text-center">
+                                                <i class='text-danger'>Tidak ada dokumen</i>
+                                            </td>
+                                        </tr>
                                     @endforelse
                                 </tbody>
                             </table>
-
                         </div>
+                    </div>
+                    <div class="card-footer d-flex justify-content-end">
+                        {{ $semua_dokumen->links() }}
                     </div>
                 </div>
 

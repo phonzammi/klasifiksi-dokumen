@@ -44,9 +44,9 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @forelse ($semua_jenis_dokumen as $jenis_dokumen)
+                                    @forelse ($semua_jenis_dokumen as $index => $jenis_dokumen)
                                         <tr>
-                                            <th scope="row">{{ $loop->iteration }}</th>
+                                            <th scope="row">{{ $semua_jenis_dokumen->firstItem() + $index }}</th>
                                             <td>{{ $jenis_dokumen->jenis_dokumen }}</td>
                                             <td>
                                                 @forelse ($jenis_dokumen->roles as $hak_akses)
@@ -83,6 +83,9 @@
                             </table>
 
                         </div>
+                    </div>
+                    <div class="card-footer d-flex justify-content-end">
+                        {{ $semua_jenis_dokumen->links() }}
                     </div>
                 </div>
 
