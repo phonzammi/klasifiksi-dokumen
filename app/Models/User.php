@@ -36,6 +36,11 @@ class User extends Authenticatable
         return $this->belongsTo(Role::class, 'role_id');
     }
 
+    public function hak_akses()
+    {
+        return $this->belongsTo(Role::class, 'role_id');
+    }
+
     /**
      * The attributes that should be hidden for serialization.
      *

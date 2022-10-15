@@ -13,7 +13,7 @@ class ListRoles extends Component
     public $openDeleteRoleConfirmation = false;
     public $role_name, $roleModel;
 
-    protected $listeners = ['editRoleModal', 'deleteRoleConfirmation'];
+    protected $listeners = ['editRoleModal', 'deleteRoleConfirmation', 'closeModal' => 'closeRoleModal'];
 
     protected $rules = [
         'role_name' => 'required|max:50|unique:roles,role_name',
@@ -89,6 +89,9 @@ class ListRoles extends Component
 
     public function closeRoleModal()
     {
+        if ($this->isEditing) {
+            $this->role_name = "";
+        }
         $this->openRoleModal = false;
         $this->isEditing = false;
         $this->openDeleteRoleConfirmation = false;

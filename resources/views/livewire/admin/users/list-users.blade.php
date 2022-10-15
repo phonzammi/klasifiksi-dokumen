@@ -28,61 +28,7 @@
                 </div>
                 <div class="card">
                     <div class="card-body">
-                        <div class="table-responsive">
-                            <table class="table table-hover">
-                                <thead>
-                                    <tr>
-                                        <th scope="col">No.</th>
-                                        <th scope="col">NIM/NIP</th>
-                                        <th scope="col">Nama</th>
-                                        <th scope="col">Email</th>
-                                        <th scope="col">Jabatan (Hak Akses)</th>
-                                        <th scope="col">#Aksi</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @forelse ($users as $user)
-                                        <tr>
-                                            <th scope="row">{{ $loop->iteration }}</th>
-                                            <td class="{{ !$user->nim_nip ? 'text-danger' : '' }}">
-                                                {{ $user->nim_nip ?? 'Tidak Tersedia' }}</td>
-                                            <td>{{ $user->name }}{{ $user->is_admin ? ' (Admin)' : '' }}</td>
-                                            <td>{{ $user->email }}</td>
-                                            <td>
-                                                @if ($user->has('role'))
-                                                    @if ($user->role->id == App\Models\Role::IS_DOSEN)
-                                                        <span class="badge badge-primary">
-                                                            {{ $user->role->role_name }}
-                                                        </span>
-                                                    @else
-                                                        <span class="badge badge-success">
-                                                            {{ $user->role->role_name }}
-                                                        </span>
-                                                    @endif
-                                                @else
-                                                    <span class="badge badge-danger">
-                                                        {{ __('Tidak Tersedia') }}
-                                                    </span>
-                                                @endif
-                                            </td>
-                                            <td>
-                                                <a href="#">
-                                                    <i class="far fa-edit mr-1"></i>
-                                                </a>
-                                                <a href="#">
-                                                    <i class="fas fa-trash text-danger"></i>
-                                                </a>
-                                            </td>
-                                        </tr>
-                                    @empty
-                                        <tr>
-                                            <td colspan="6">Tidak ada user</td>
-                                        </tr>
-                                    @endforelse
-                                </tbody>
-                            </table>
-
-                        </div>
+                        <livewire:admin.datatable.users-table />
                     </div>
                 </div>
 
@@ -95,107 +41,126 @@
     {{--
     </div> --}}
     <!-- /.content -->
-    <!-- Modal -->
-    <div class="modal fade" id="createUserModal" tabindex="-1" aria-labelledby="createUserModalLabel"
-        aria-hidden="true" wire:ignore.self>
-        <div class="modal-dialog">
-            <form autocomplete="off" wire:submit.prevent="createUser">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="createUserModalLabel">Tambah User</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="form-group">
-                            <label for="name">NIM atau NIP :</label>
-                            <input type="number" wire:model="nim_nip"
-                                class="form-control @error('nim_nip') is-invalid @enderror"
-                                placeholder="NIM atau NIP ..." id="nim_nip">
-                            @error('nim_nip')
-                                <div class="invalid-feedback">
-                                    {{ $message }}
-                                </div>
-                            @enderror
-                        </div>
-                        <div class="form-group">
-                            <label for="name">Nama Lengkap :</label>
-                            <input type="text" wire:model="name"
-                                class="form-control @error('name') is-invalid @enderror" placeholder="Nama Lengkap ..."
-                                id="name">
-                            @error('name')
-                                <div class="invalid-feedback">
-                                    {{ $message }}
-                                </div>
-                            @enderror
-                        </div>
-                        <div class="form-group">
-                            <label for="role_id">Jabatan :</label>
-                            <select id="role_id" wire:model.lazy="role_id"
-                                class="custom-select @error('role_id') is-invalid @enderror">
-                                <option value="">Pilih Jabatan ...</option>
-                                @foreach ($roles as $role)
-                                    <option value="{{ $role->id }}">{{ $role->role_name }}</option>
-                                @endforeach
-                            </select>
-                            @error('role_id')
-                                <div class="invalid-feedback">
-                                    {{ $message }}
-                                </div>
-                            @enderror
-                        </div>
-                        <div class="form-group">
-                            <label for="email">Alamat Email :</label>
-                            <input type="email" wire:model="email"
-                                class="form-control @error('email') is-invalid @enderror" placeholder="Alamat Email ..."
-                                id="email">
-                            @error('email')
-                                <div class="invalid-feedback">
-                                    {{ $message }}
-                                </div>
-                            @enderror
-                        </div>
-                        <div class="form-group">
-                            <label for="password">Kata Sandi :</label>
-                            <input type="password" wire:model='password'
-                                class="form-control @error('password') is-invalid @enderror"
-                                placeholder="Kata Sandi ..." id="password">
-                            @error('password')
-                                <div class="invalid-feedback">
-                                    {{ $message }}
-                                </div>
-                            @enderror
-                        </div>
-                        <div class="form-group">
-                            <label for="passwordConfirmation">Konfirmasi Kata Sandi :</label>
-                            <input type="password" wire:model='password_confirmation'
-                                class="form-control @error('password_confirmation') is-invalid @enderror"
-                                placeholder="Konfirmasi Kata Sandi ...">
-                            @error('password_confirmation')
-                                <div class="invalid-feedback">
-                                    {{ $message }}
-                                </div>
-                            @enderror
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
-                        <button type="submit" class="btn btn-primary">Save changes</button>
-                    </div>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
-@push('scripts')
-    <script>
-        window.addEventListener('show-create-user-modal', event => {
-            $("#createUserModal").modal('show');
-        })
+    <x-jet-dialog-modal wire:model="openUserModal">
+        <x-slot name="title">
+            @if ($isEditing)
+                {{ __('Edit User') }}
+            @else
+                {{ __('Tambah User Baru') }}
+            @endif
+        </x-slot>
 
-        window.addEventListener('close-create-user-modal', event => {
-            $("#createUserModal").modal('hide');
-        })
-    </script>
-@endpush
+        <x-slot name="content">
+            <div class="mx-2">
+                <div class="form-group">
+                    <x-jet-label for="nim_nip">NIM atau NIP</x-jet-label>
+
+                    <x-jet-input type='number' placeholder="{{ __('NIM atau NIP ...') }}"
+                        class="{{ $errors->has('nim_nip') ? 'is-invalid' : '' }}" wire:model.debounce.500ms="nim_nip"
+                        wire:keydown.enter="create" />
+
+                    <x-jet-input-error for="nim_nip" class="mt-2" />
+                </div>
+
+                <div class="form-group">
+                    <x-jet-label for="name">Nama Lengkap :</x-jet-label>
+
+                    <x-jet-input type='text' placeholder="{{ __('Nama Lengkap ...') }}"
+                        class="{{ $errors->has('name') ? 'is-invalid' : '' }}" wire:model.debounce.500ms="name"
+                        wire:keydown.enter="create" />
+
+                    <x-jet-input-error for="name" class="mt-2" />
+                </div>
+
+                <div class="form-group">
+                    <x-jet-label for="role_id">Hak Akses (Jabatan) :</x-jet-label>
+
+                    <select id="role_id" wire:model.lazy="role_id"
+                        class="custom-select @error('role_id') is-invalid @enderror">
+                        <option value="">Pilih Jabatan ...</option>
+                        @foreach ($roles as $role)
+                            <option value="{{ $role->id }}">{{ $role->role_name }}</option>
+                        @endforeach
+                    </select>
+
+                    <x-jet-input-error for="role_id" class="mt-2" />
+                </div>
+
+                <div class="form-group">
+                    <x-jet-label for="email">Alamat Email :</x-jet-label>
+
+                    <x-jet-input type='text' placeholder="{{ __('Alamat Email ...') }}"
+                        class="{{ $errors->has('email') ? 'is-invalid' : '' }}" wire:model.debounce.500ms="email"
+                        wire:keydown.enter="create" />
+
+                    <x-jet-input-error for="email" class="mt-2" />
+                </div>
+
+                <div class="form-group">
+                    <x-jet-label for="password">Kata Sandi {{ $isEditing ? 'Baru' : '' }} :</x-jet-label>
+
+                    <x-jet-input type='password' placeholder="{{ __('Kata Sandi ...') }}"
+                        class="{{ $errors->has('password') ? 'is-invalid' : '' }}" wire:model.debounce.500ms="password"
+                        wire:keydown.enter="create" />
+
+                    <x-jet-input-error for="password" class="mt-2" />
+                </div>
+
+                <div class="form-group">
+                    <x-jet-label for="password_confirmation">Konfirmasi Kata Sandi {{ $isEditing ? 'Baru' : '' }} :
+                    </x-jet-label>
+
+                    <x-jet-input type='password' placeholder="{{ __('Konfirmasi Kata Sandi ...') }}"
+                        class="{{ $errors->has('password_confirmation') ? 'is-invalid' : '' }}"
+                        wire:model.debounce.500ms="password_confirmation" wire:keydown.enter="create" />
+
+                    <x-jet-input-error for="password_confirmation" class="mt-2" />
+                </div>
+            </div>
+        </x-slot>
+
+        <x-slot name="footer">
+            <button class="btn btn-danger" wire:click="closeUserModal" wire:loading.attr="disabled">
+                {{ __('Batal') }}
+            </button>
+
+            <button type="submit" class="btn btn-primary" wire:click="{{ $isEditing ? 'update' : 'create' }}"
+                wire:loading.attr="disabled">
+
+                @if ($isEditing)
+                    {{ __('Simpan') }}
+                @else
+                    {{ __('Tambah') }}
+                @endif
+            </button>
+        </x-slot>
+    </x-jet-dialog-modal>
+
+    <!-- Delete User Confirmation Modal -->
+    <x-jet-dialog-modal wire:model="openDeleteUserConfirmation">
+        <x-slot name="title">
+            {{ __("Hapus User '{$this->name}' ") }}
+        </x-slot>
+
+        <x-slot name="content">
+            {{ __("Anda yakin ingin menghapus user '{$this->name}'?") }}
+            <p class='text-danger font-italic'>
+                {{ __("Aksi ini juga akan menghapus seluruh Dokumen yang berhubungan dengan user '{$this->name}'!!!") }}
+            </p>
+        </x-slot>
+
+        <x-slot name="footer">
+            <x-jet-secondary-button wire:click="closeUserModal" wire:loading.attr="disabled">
+                {{ __('Batal') }}
+            </x-jet-secondary-button>
+
+            <x-jet-danger-button wire:click="delete" wire:loading.attr="disabled">
+                <div wire:loading wire:target="delete" class="spinner-border spinner-border-sm" role="status">
+                    <span class="visually-hidden"></span>
+                </div>
+
+                {{ __('Hapus') }}
+            </x-jet-danger-button>
+        </x-slot>
+    </x-jet-dialog-modal>
+</div>

@@ -175,7 +175,7 @@
             {{ __("Anda yakin ingin menghapus jenis dokumen '{$this->jenis_dokumen}'?") }}
             <p class='text-danger font-italic'>
                 {{ __("Aksi ini juga akan menghapus seluruh dokumen yang berhubungan dengan Jenis Dokumen
-                                                                                                                                                                                '{$this->jenis_dokumen}'!!!") }}
+                                                                                                                                                                                                '{$this->jenis_dokumen}'!!!") }}
             </p>
         </x-slot>
 
@@ -196,12 +196,12 @@
     </x-jet-dialog-modal>
 </div>
 @push('scripts')
-    <script>
+    {{-- <script>
         $('#role_id').select2({
             placeholder: 'Pilih Hak Akses',
             allowClear: true
         }).on('change', function() {
             @this.set('hak_akses', $(this).val());
         });
-    </script>
+    </script> --}}
 @endpush
