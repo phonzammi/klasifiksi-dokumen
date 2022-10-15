@@ -14,19 +14,17 @@ class ListJenisDocument extends Component
     protected $paginationTheme = 'bootstrap';
 
     public $jenis_dokumen, $jenisDokumenModel, $jenisDokumenId;
-    public $hak_akses = [];
+    public $selectedRoles = [];
     public $openJenisDocumentModal = false;
     public $openDeleteJenisDocumentModal = false;
     public $isEditing = false;
 
     protected $rules = [
-        'jenis_dokumen' => 'required|unique:jenis_dokumen,jenis_dokumen',
-        'hak_akses' => 'nullable',
+        'jenis_dokumen' => 'required|unique:jenis_dokumen,jenis_dokumen'
     ];
 
     protected $validationAttributes = [
-        'jenis_dokumen' => 'Jenis Dokumen',
-        'hak_akses' => 'Hak Akses'
+        'jenis_dokumen' => 'Jenis Dokumen'
     ];
 
     // public function updated($fields)
@@ -38,7 +36,7 @@ class ListJenisDocument extends Component
     {
         $this->jenisDokumenId = "";
         $this->jenis_dokumen = "";
-        $this->hak_akses = [];
+        $this->selectedRoles = [];
         $this->openJenisDocumentModal = false;
         $this->openDeleteJenisDocumentModal = false;
         $this->isEditing = false;
@@ -49,7 +47,7 @@ class ListJenisDocument extends Component
     {
         $this->openJenisDocumentModal = false;
         $this->isEditing = false;
-        $this->hak_akses = [];
+        $this->selectedRoles = [];
     }
 
     public function closeDeleteJenisDocumentModal()
@@ -87,8 +85,9 @@ class ListJenisDocument extends Component
     {
         $validatedData = $this->validate();
         $jenis_dokumen_baru = JenisDokumen::create($validatedData);
-        if (count($this->hak_akses) > 0) {
-            $jenis_dokumen_baru->roles()->attach($this->hak_akses);
+
+        if (count($this->selectedRoles) > 0) {
+            $jenis_dokumen_baru->roles()->attach($this->selectedRoles);
         }
 
         session()->flash('message', "Jenis Dokumen Baru Berhasil Ditambahkan !");
@@ -100,21 +99,20 @@ class ListJenisDocument extends Component
         $this->openJenisDocumentModal = true;
         $this->isEditing = true;
 
-        $this->jenisDokumenModel = $jenis_dokumen;
+        $this->jenisDokumenModel = $jenis_dokumen->loadMissing(['roles']);
         $this->jenis_dokumen = $jenis_dokumen->jenis_dokumen;
+        $this->selectedRoles = $this->jenisDokumenModel->roles->pluck('id')->toArray();
+        // dd($this->jenisDokumenModel->roles->pluck('id')->toArray());
     }
 
     public function updateJenisDocument()
     {
         $validatedData = $this->validate([
-            'jenis_dokumen' => 'required|unique:jenis_dokumen,jenis_dokumen,' . $this->jenisDokumenModel->id,
-            'hak_akses' => 'nullable',
+            'jenis_dokumen' => 'required|unique:jenis_dokumen,jenis_dokumen,' . $this->jenisDokumenModel->id
         ]);
 
         $this->jenisDokumenModel->update($validatedData);
-        if (count($this->hak_akses) > 0) {
-            $this->jenisDokumenModel->roles()->sync($this->hak_akses);
-        }
+        $this->jenisDokumenModel->roles()->sync($this->selectedRoles);
         session()->flash('message', "Jenis Dokumen Berhasil Diperbarui !");
         $this->resetInput();
     }

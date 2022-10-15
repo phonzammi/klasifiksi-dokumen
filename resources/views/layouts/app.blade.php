@@ -87,7 +87,7 @@
                                     <a href="{{ route('admin.documents.index') }}"
                                         class="nav-link {{ request()->routeIs('admin.documents.index') ? 'active' : '' }}">
                                         <i class="nav-icon fas fa-file-upload"></i>
-                                        <p>Seluruh Dokumen</p>
+                                        <p>List Dokumen</p>
                                     </a>
                                 </li>
                                 <li class="nav-item">
@@ -105,6 +105,13 @@
                                 class="nav-link {{ request()->routeIs('admin.users') ? 'active' : '' }}">
                                 <i class="nav-icon fas fa-users"></i>
                                 <p>List Users</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('admin.roles') }}"
+                                class="nav-link {{ request()->routeIs('admin.roles') ? 'active' : '' }}">
+                                <i class="nav-icon fas fa-user-tag"></i>
+                                <p>List Hak Akses (Jabatan)</p>
                             </a>
                         </li>
                     </ul>

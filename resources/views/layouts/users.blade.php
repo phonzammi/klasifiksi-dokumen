@@ -32,7 +32,7 @@
     <div id="app">
         <nav class="bg-white shadow-sm navbar navbar-expand-md navbar-light">
             <div class="container">
-                <a class="navbar-brand" href="{{ route('users.index') }}">
+                <a class="navbar-brand" href="{{ route('users.documents.index') }}">
                     Klasifikasi Dokumen
                 </a>
                 <button class="navbar-toggler" type="button" data-toggle="collapse"
@@ -43,7 +43,7 @@
 
                 <div class="collapse navbar-collapse" id="navbarSupportedContent">
                     <!-- Left Side Of Navbar -->
-                    <ul class="mr-auto navbar-nav">
+                    {{-- <ul class="mr-auto navbar-nav">
                         <li class="nav-item">
                             <a class="nav-link {{ request()->routeIs('users.documents.index') ? 'active' : '' }}"
                                 href="{{ route('users.documents.index') }}">Lihat Dokumen</a>
@@ -51,7 +51,7 @@
                         <li class="nav-item">
                             <a class="nav-link" href="#">Upload Dokumen Baru</a>
                         </li>
-                    </ul>
+                    </ul> --}}
 
                     <!-- Right Side Of Navbar -->
                     <ul class="ml-auto navbar-nav">

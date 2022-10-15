@@ -61,7 +61,7 @@ class ListUsers extends Component
     public function render()
     {
         $roles = Role::all();
-        $users = User::with('role')->latest()->paginate();
+        $users = User::where("is_admin", 0)->with('role')->latest()->paginate();
         return view('livewire.admin.users.list-users', compact('users', 'roles'));
     }
 }

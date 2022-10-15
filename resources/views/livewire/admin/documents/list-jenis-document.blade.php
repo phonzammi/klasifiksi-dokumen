@@ -1,7 +1,7 @@
 <div>
     <x-slot name="header">
         <div class="col-sm-6">
-            <h1 class="m-0">Seluruh Dokumen</h1>
+            <h1 class="m-0">List Jenis Dokumen</h1>
         </div><!-- /.col -->
         <div class="col-sm-6">
             <ol class="breadcrumb float-sm-right">
@@ -121,7 +121,7 @@
             <div wire:ignore class="form-group">
                 <x-jet-label for="role_id">Hak Akses</x-jet-label>
 
-                <select id="role_id" wire:model='hak_akses'
+                {{-- <select id="role_id" wire:model='hak_akses'
                     class="select2 form-control @error('role_id') is-invalid @enderror" multiple="multiple"
                     style="width: 100%;">
                     @foreach ($roles as $hakAkses)
@@ -129,11 +129,21 @@
                             {{ $hakAkses->role_name }}
                         </option>
                     @endforeach
-                </select>
-
+                </select> --}}
+                <div class="mx-2">
+                    @foreach ($roles as $hakAkses)
+                        <div class="custom-control custom-checkbox">
+                            <input type="checkbox" class="custom-control-input" wire:model="selectedRoles"
+                                value="{{ $hakAkses->id }}" id="role_id_{{ $hakAkses->id }}">
+                            <label class="custom-control-label"
+                                for="role_id_{{ $hakAkses->id }}">{{ $hakAkses->role_name }}</label>
+                        </div>
+                    @endforeach
+                </div>
                 <x-jet-input-error for="role_id" class="mt-2" />
             </div>
-            {{-- </form> --}}
+            {{--
+            </form> --}}
 
         </x-slot>
 
@@ -164,7 +174,8 @@
         <x-slot name="content">
             {{ __("Anda yakin ingin menghapus jenis dokumen '{$this->jenis_dokumen}'?") }}
             <p class='text-danger font-italic'>
-                {{ __("Aksi ini juga akan menghapus seluruh dokumen yang berhubungan dengan Jenis Dokumen '{$this->jenis_dokumen}'!!!") }}
+                {{ __("Aksi ini juga akan menghapus seluruh dokumen yang berhubungan dengan Jenis Dokumen
+                                                                                                                                                                                '{$this->jenis_dokumen}'!!!") }}
             </p>
         </x-slot>
 

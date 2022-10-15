@@ -41,17 +41,16 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @foreach ($users as $user)
+                                    @forelse ($users as $user)
                                         <tr>
                                             <th scope="row">{{ $loop->iteration }}</th>
                                             <td class="{{ !$user->nim_nip ? 'text-danger' : '' }}">
                                                 {{ $user->nim_nip ?? 'Tidak Tersedia' }}</td>
-                                            <td>{{ $user->name }}</td>
+                                            <td>{{ $user->name }}{{ $user->is_admin ? ' (Admin)' : '' }}</td>
                                             <td>{{ $user->email }}</td>
                                             <td>
-                                                {{-- {{ $user->has('role') ? $user->role->role_name : 'Tidak Tersedia' }} --}}
                                                 @if ($user->has('role'))
-                                                    @if ($user->role->role_id = App\Models\Role::IS_DOSEN)
+                                                    @if ($user->role->id == App\Models\Role::IS_DOSEN)
                                                         <span class="badge badge-primary">
                                                             {{ $user->role->role_name }}
                                                         </span>
@@ -75,9 +74,11 @@
                                                 </a>
                                             </td>
                                         </tr>
-                                    @endforeach
-
-                                    {{-- @endforelse --}}
+                                    @empty
+                                        <tr>
+                                            <td colspan="6">Tidak ada user</td>
+                                        </tr>
+                                    @endforelse
                                 </tbody>
                             </table>
 
@@ -91,11 +92,12 @@
         </div>
         <!-- /.row -->
     </div><!-- /.container-fluid -->
-    {{-- </div> --}}
+    {{--
+    </div> --}}
     <!-- /.content -->
     <!-- Modal -->
-    <div class="modal fade" id="createUserModal" tabindex="-1" aria-labelledby="createUserModalLabel" aria-hidden="true"
-        wire:ignore.self>
+    <div class="modal fade" id="createUserModal" tabindex="-1" aria-labelledby="createUserModalLabel"
+        aria-hidden="true" wire:ignore.self>
         <div class="modal-dialog">
             <form autocomplete="off" wire:submit.prevent="createUser">
                 <div class="modal-content">
@@ -195,6 +197,5 @@
         window.addEventListener('close-create-user-modal', event => {
             $("#createUserModal").modal('hide');
         })
-
     </script>
 @endpush

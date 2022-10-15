@@ -4,6 +4,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Livewire\Admin\Documents\ListDocuments as AdminListDocuments;
 use App\Http\Livewire\Users\Documents\ListDocuments as UsersListDocuments;
 use App\Http\Livewire\Admin\Documents\ListJenisDocument;
+use App\Http\Livewire\Admin\Roles\ListRoles;
 use Illuminate\Support\Facades\Route;
 use App\Http\Livewire\Admin\Users\ListUsers;
 
@@ -25,12 +26,12 @@ Route::middleware([
     'verified'
 ])->group(function () {
     Route::group(['prefix' => '/', 'as' => 'users.', 'middleware' => 'isUser'], function () {
-        Route::get('/', function () {
-            return view('users/home');
-        })->name('index');
-        Route::prefix('documents')->group(function () {
-            Route::get('/', UsersListDocuments::class)->name('documents.index');
-        });
+        // Route::get('/', function () {
+        //     return view('users/home');
+        // })->name('index');
+        Route::get('/', UsersListDocuments::class)->name('documents.index');
+        // Route::prefix('documents')->group(function () {
+        // });
     });
 
     Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => 'isAdmin'], function () {
@@ -40,5 +41,6 @@ Route::middleware([
             Route::get('/', AdminListDocuments::class)->name('documents.index');
             Route::get('jenis', ListJenisDocument::class)->name('documents.jenis');
         });
+        Route::get('hak-akses', ListRoles::class)->name('roles');
     });
 });
