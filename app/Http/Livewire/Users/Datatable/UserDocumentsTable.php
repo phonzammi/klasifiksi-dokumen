@@ -7,6 +7,7 @@ use Rappasoft\LaravelLivewireTables\Views\Column;
 use App\Models\Dokumen;
 use App\Models\JenisDokumen;
 use Illuminate\Database\Eloquent\Builder;
+use Rappasoft\LaravelLivewireTables\Views\Columns\ButtonGroupColumn;
 use Rappasoft\LaravelLivewireTables\Views\Columns\LinkColumn;
 use Rappasoft\LaravelLivewireTables\Views\Filters\MultiSelectFilter;
 
@@ -37,13 +38,28 @@ class UserDocumentsTable extends DataTableComponent
                 ->sortable()
                 ->searchable(),
             Column::make("Diupload Oleh", "uploaded_by.name"),
-            LinkColumn::make('Download', 'lampiran_url')
-                ->title(fn ($row) => $row->nama_dokumen)
+            LinkColumn::make('Aksi', 'lampiran_url')
+                ->title(fn ($row) => "Unduh")
                 ->location(fn ($row) => $row->lampiran_url)
                 ->attributes(fn ($row) => [
                     'class' => 'btn btn-sm btn-success',
                     'alt' => 'Lampiran ' . $row->nama_dokumen,
                 ]),
+            // ButtonGroupColumn::make('Aksi')
+            //     ->attributes(function ($row) {
+            //         return [
+            //             'class' => 'mx-auto',
+            //         ];
+            //     })
+            //     ->buttons([
+            //         LinkColumn::make('Aksi', 'lampiran_url')
+            //             ->title(fn ($row) => "Unduh")
+            //             ->location(fn ($row) => $row->lampiran_url)
+            //             ->attributes(fn ($row) => [
+            //                 'class' => 'btn btn-sm btn-success',
+            //                 'alt' => 'Lampiran ' . $row->nama_dokumen,
+            //             ]),
+            //     ]),
         ];
     }
 
@@ -53,6 +69,9 @@ class UserDocumentsTable extends DataTableComponent
             MultiSelectFilter::make('Jenis Dokumen')
                 ->options(
                     JenisDokumen::query()
+                        ->whereHas('roles', function ($query) {
+                            $query->where('role_id', auth()->user()->role_id);
+                        })
                         ->orderBy('jenis_dokumen')
                         ->get()
                         ->keyBy('id')
@@ -67,7 +86,6 @@ class UserDocumentsTable extends DataTableComponent
     public function builder(): Builder
     {
         return Dokumen::query()
-            ->with('jenis_dokumen')
             ->whereHas('jenis_dokumen.roles', function ($query) {
                 $query->where('role_jenis_dokumen.role_id', auth()->user()->role_id);
             })

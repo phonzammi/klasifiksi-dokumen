@@ -120,7 +120,7 @@ class ListJenisDocument extends Component
     public function render()
     {
         $roles = Role::all();
-        $semua_jenis_dokumen = JenisDokumen::with('roles')->paginate(10);
+        $semua_jenis_dokumen = JenisDokumen::with(['roles'])->paginate(10);
         return view('livewire.admin.documents.list-jenis-document', [
             'roles' => $roles,
             'semua_jenis_dokumen' => $semua_jenis_dokumen

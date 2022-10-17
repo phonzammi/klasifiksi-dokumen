@@ -20,6 +20,11 @@ class JenisDokumen extends Model
      */
     public function roles()
     {
-        return $this->belongsToMany(Role::class, 'role_jenis_dokumen', 'jenis_dokumen_id', 'role_id');
+        return $this->belongsToMany(Role::class, 'role_jenis_dokumen', 'jenis_dokumen_id', 'role_id')->orderByPivot('role_id');
+    }
+
+    public function documents()
+    {
+        return $this->hasMany(Dokumen::class, 'jenis_dokumen_id');
     }
 }

@@ -29,7 +29,8 @@ Route::middleware([
         // Route::get('/', function () {
         //     return view('users/home');
         // })->name('index');
-        Route::get('/', UsersListDocuments::class)->name('documents.index');
+        Route::get('/', UsersListDocuments::class)->name('index');
+        // Route::get('/', UsersListDocuments::class)->name('documents.index');
         // Route::prefix('documents')->group(function () {
         // });
     });

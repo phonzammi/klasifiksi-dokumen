@@ -7,6 +7,7 @@ use App\Models\JenisDokumen;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 use Livewire\WithPagination;
 
 class ListDocuments extends Component
@@ -34,7 +35,13 @@ class ListDocuments extends Component
 
     public function updated($fields)
     {
-        $this->validateOnly($fields);
+        $this->nama_dokumen = Str::title($this->nama_dokumen);
+
+        $this->validateOnly($fields, [
+            'nama_dokumen' => ['required', Rule::unique('dokumen')->ignore($this->dokumenModel)],
+            'jenis_dokumen_id' => 'required|numeric',
+            'lampiran' => 'required|mimes:pdf|max:2048'
+        ]);
     }
 
     public function resetInput()
@@ -62,7 +69,7 @@ class ListDocuments extends Component
         $nama_lampiran = Str::slug($validatedData['nama_dokumen']) . "." . $this->lampiran->extension();
 
         $dokumen_baru = new Dokumen();
-        $dokumen_baru->nama_dokumen = Str::title($validatedData['nama_dokumen']);
+        $dokumen_baru->nama_dokumen = $validatedData['nama_dokumen'];
         $dokumen_baru->jenis_dokumen_id = $validatedData['jenis_dokumen_id'];
         $dokumen_baru->user_id = auth()->user()->id;
         $dokumen_baru->lampiran = $nama_lampiran;

@@ -32,7 +32,7 @@
     <div id="app">
         <nav class="bg-white shadow-sm navbar navbar-expand-md navbar-light">
             <div class="container">
-                <a class="navbar-brand" href="{{ route('users.documents.index') }}">
+                <a class="navbar-brand" href="{{ route('users.index') }}">
                     Klasifikasi Dokumen
                 </a>
                 <button class="navbar-toggler" type="button" data-toggle="collapse"

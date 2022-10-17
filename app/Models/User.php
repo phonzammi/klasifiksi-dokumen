@@ -41,6 +41,11 @@ class User extends Authenticatable
         return $this->belongsTo(Role::class, 'role_id');
     }
 
+    public function documents()
+    {
+        return $this->hasMany(Dokumen::class, 'user_id');
+    }
+
     /**
      * The attributes that should be hidden for serialization.
      *
@@ -70,4 +75,9 @@ class User extends Authenticatable
     protected $appends = [
         'profile_photo_url',
     ];
+
+    // public function setPasswordAttribute($value)
+    // {
+    //     $this->attributes['password'] = bcrypt($value);
+    // }
 }
