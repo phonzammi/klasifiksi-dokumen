@@ -39,27 +39,61 @@
                                     <tr>
                                         <th scope="col">No.</th>
                                         <th scope="col">Jenis Dokumen</th>
-                                        <th scope="col">Hak Akses</th>
+                                        <th scope="col" style="width: 40%">Hak Akses</th>
                                         <th scope="col">#Aksi</th>
                                     </tr>
                                 </thead>
                                 <tbody>
+                                    {{-- {{ dd($semua_jenis_dokumen) }} --}}
+
                                     @forelse ($semua_jenis_dokumen as $index => $jenis_dokumen)
                                         <tr>
                                             <th scope="row">{{ $semua_jenis_dokumen->firstItem() + $index }}</th>
                                             <td>{{ $jenis_dokumen->jenis_dokumen }}</td>
                                             <td>
-                                                @forelse ($jenis_dokumen->roles as $hak_akses)
-                                                    <span class="badge badge-primary">
-                                                        {{ $hak_akses->role_name }}
-                                                    </span>
-                                                @empty
-                                                    <span class="badge badge-warning">
-                                                        {{ __('Tidak Tersedia') }}
-                                                    </span>
-                                                @endforelse
+                                                @if ($jenis_dokumen->roles->count() > 0)
+                                                    <ul class="list-group">
+                                                        @foreach ($jenis_dokumen->roles as $hak_akses)
+                                                            <li
+                                                                class="list-group-item d-flex justify-content-between align-items-center">
+                                                                {{ $hak_akses->role_name }}
+                                                                <span class="row d-flex justify-content-between gx-3">
+                                                                    <span
+                                                                        class="badge badge-{{ $hak_akses->pivot->view ? 'success' : 'danger' }} badge-pill">
+                                                                        @if ($hak_akses->pivot->view)
+                                                                            <i class="fas fa-check-circle"></i>
+                                                                        @else
+                                                                            <i class="far fa-times-circle"></i>
+                                                                        @endif
+                                                                        Lihat
+                                                                    </span>
+                                                                    <span
+                                                                        class="badge badge-{{ $hak_akses->pivot->upload ? 'success' : 'danger' }} badge-pill mx-2">
+                                                                        @if ($hak_akses->pivot->upload)
+                                                                            <i class="fas fa-check-circle"></i>
+                                                                        @else
+                                                                            <i class="far fa-times-circle"></i>
+                                                                        @endif
+                                                                        Upload
+                                                                    </span>
+                                                                    <span
+                                                                        class="badge badge-{{ $hak_akses->pivot->download ? 'success' : 'danger' }} badge-pill">
+                                                                        @if ($hak_akses->pivot->download)
+                                                                            <i class="fas fa-check-circle"></i>
+                                                                        @else
+                                                                            <i class="far fa-times-circle"></i>
+                                                                        @endif
+                                                                        Download
+                                                                    </span>
+                                                                </span>
+                                                            </li>
+                                                        @endforeach
+                                                    </ul>
+                                                @else
+                                                    <span class="badge badge-warning">Tidak Tersedia</span>
+                                                @endif
                                             </td>
-                                            <td>
+                                            <td class="align-middle">
                                                 <a href="#"
                                                     wire:click='editJenisDocumentModal({{ $jenis_dokumen }})'>
                                                     <i class="far fa-edit mr-1"></i>
@@ -120,23 +154,35 @@
 
             <div wire:ignore class="form-group">
                 <x-jet-label for="role_id">Hak Akses</x-jet-label>
-
-                {{-- <select id="role_id" wire:model='hak_akses'
-                    class="select2 form-control @error('role_id') is-invalid @enderror" multiple="multiple"
-                    style="width: 100%;">
-                    @foreach ($roles as $hakAkses)
-                        <option value="{{ $hakAkses->id }}">
-                            {{ $hakAkses->role_name }}
-                        </option>
-                    @endforeach
-                </select> --}}
                 <div class="mx-2">
                     @foreach ($roles as $hakAkses)
-                        <div class="custom-control custom-checkbox">
-                            <input type="checkbox" class="custom-control-input" wire:model="selectedRoles"
-                                value="{{ $hakAkses->id }}" id="role_id_{{ $hakAkses->id }}">
-                            <label class="custom-control-label"
-                                for="role_id_{{ $hakAkses->id }}">{{ $hakAkses->role_name }}</label>
+                        <div x-data="{ show: false }">
+                            <div class="custom-control custom-checkbox">
+                                <input type="checkbox" class="custom-control-input" x-on:click="show = !show"
+                                    wire:model="selectedRoles" value="{{ $hakAkses->id }}"
+                                    wire:click='selectRole({{ $hakAkses->id }})' id="role_id_{{ $hakAkses->id }}">
+                                <label class="custom-control-label"
+                                    for="role_id_{{ $hakAkses->id }}">{{ $hakAkses->role_name }}</label>
+                            </div>
+
+                            <div class="ml-4 mb-2">
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" wire:model='view.{{ $hakAkses->id }}'
+                                        type="checkbox" id="inlineCheckbox1" value="1">
+                                    <label class="form-check-label" for="inlineCheckbox1">Lihat</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" wire:model='upload.{{ $hakAkses->id }}'
+                                        type="checkbox" id="inlineCheckbox2" value="1">
+                                    <label class="form-check-label" for="inlineCheckbox2">Upload</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" wire:model='download.{{ $hakAkses->id }}'
+                                        type="checkbox" id="inlineCheckbox3" value="1">
+                                    <label class="form-check-label" for="inlineCheckbox3">Download</label>
+                                </div>
+                            </div>
+
                         </div>
                     @endforeach
                 </div>
@@ -175,7 +221,7 @@
             {{ __("Anda yakin ingin menghapus jenis dokumen '{$this->jenis_dokumen}'?") }}
             <p class='text-danger font-italic'>
                 {{ __("Aksi ini juga akan menghapus seluruh dokumen yang berhubungan dengan Jenis Dokumen
-                                                                                                                                                                                                '{$this->jenis_dokumen}'!!!") }}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    '{$this->jenis_dokumen}'!!!") }}
             </p>
         </x-slot>
 
@@ -195,13 +241,3 @@
         </x-slot>
     </x-jet-dialog-modal>
 </div>
-@push('scripts')
-    {{-- <script>
-        $('#role_id').select2({
-            placeholder: 'Pilih Hak Akses',
-            allowClear: true
-        }).on('change', function() {
-            @this.set('hak_akses', $(this).val());
-        });
-    </script> --}}
-@endpush

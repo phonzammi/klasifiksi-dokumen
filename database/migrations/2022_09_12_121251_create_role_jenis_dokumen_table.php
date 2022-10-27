@@ -22,6 +22,9 @@ class CreateRoleJenisDokumenTable extends Migration
                 ->constrained('jenis_dokumen')
                 ->onUpdate('cascade')
                 ->onDelete('cascade');
+            $table->boolean('view');
+            $table->boolean('upload');
+            $table->boolean('download');
         });
     }
 

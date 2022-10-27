@@ -20,7 +20,26 @@ class JenisDokumen extends Model
      */
     public function roles()
     {
-        return $this->belongsToMany(Role::class, 'role_jenis_dokumen', 'jenis_dokumen_id', 'role_id')->orderByPivot('role_id');
+        return $this->belongsToMany(Role::class, 'role_jenis_dokumen', 'jenis_dokumen_id', 'role_id')->orderByPivot('role_id')
+            ->withPivot('view', 'upload', 'download');
+    }
+
+    public function roles_can_view()
+    {
+        return $this->belongsToMany(Role::class, 'role_jenis_dokumen', 'jenis_dokumen_id', 'role_id')
+            ->wherePivot('view', 1);
+    }
+
+    public function roles_can_upload()
+    {
+        return $this->belongsToMany(Role::class, 'role_jenis_dokumen', 'jenis_dokumen_id', 'role_id')
+            ->wherePivot('upload', 1);
+    }
+
+    public function roles_can_download()
+    {
+        return $this->belongsToMany(Role::class, 'role_jenis_dokumen', 'jenis_dokumen_id', 'role_id')
+            ->wherePivot('download', 1);
     }
 
     public function documents()

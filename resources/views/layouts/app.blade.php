@@ -14,9 +14,6 @@
 
     <!-- Styles -->
     <link rel="stylesheet" href="{{ mix('css/dashboard.css') }}">
-    <!-- Select2 -->
-    <link rel="stylesheet" href="{{ asset('assets/plugins/select2/css/select2.min.css') }}">
-    {{-- <link rel="stylesheet" href="{{ asset('assets/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css') }}"> --}}
     @livewireStyles
 
     <!-- Scripts -->
@@ -114,6 +111,12 @@
                                 <p>List Hak Akses (Jabatan)</p>
                             </a>
                         </li>
+                        {{-- <li class="nav-item">
+                            <a href="#" class="nav-link ">
+                                <i class="nav-icon fas fa-user-lock"></i>
+                                <p>List Izin (Permissions)</p>
+                            </a>
+                        </li> --}}
                     </ul>
                 </nav>
                 <!-- /.sidebar-menu -->
@@ -157,8 +160,6 @@
     </div>
     <!-- jQuery -->
     {{-- <script src="{{ asset('assets/plugins/jquery/jquery.min.js') }}"></script> --}}
-    <!-- Select2 -->
-    <script src="{{ asset('assets/plugins/select2/js/select2.full.min.js') }}"></script>
     @stack('modals')
     @livewireScripts
     @stack('scripts')

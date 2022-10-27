@@ -4,8 +4,10 @@ namespace App\Http\Livewire\Admin\Documents;
 
 use App\Models\JenisDokumen;
 use App\Models\Role;
+use Illuminate\Validation\Rule;
 use Livewire\Component;
 use Livewire\WithPagination;
+use Illuminate\Support\Str;
 
 class ListJenisDocument extends Component
 {
@@ -18,6 +20,9 @@ class ListJenisDocument extends Component
     public $openJenisDocumentModal = false;
     public $openDeleteJenisDocumentModal = false;
     public $isEditing = false;
+    public $view;
+    public $upload;
+    public $download;
 
     protected $rules = [
         'jenis_dokumen' => 'required|unique:jenis_dokumen,jenis_dokumen'
@@ -27,27 +32,44 @@ class ListJenisDocument extends Component
         'jenis_dokumen' => 'Jenis Dokumen'
     ];
 
-    // public function updated($fields)
-    // {
-    //     $this->validateOnly($fields);
-    // }
-
-    public function resetInput()
+    public function updated($fields)
     {
-        $this->jenisDokumenId = "";
-        $this->jenis_dokumen = "";
-        $this->selectedRoles = [];
-        $this->openJenisDocumentModal = false;
-        $this->openDeleteJenisDocumentModal = false;
-        $this->isEditing = false;
-        $this->jenisDokumenModel = "";
+        $this->jenis_dokumen = Str::title($this->jenis_dokumen);
+
+        $this->validateOnly($fields, [
+            'jenis_dokumen' => ['required', Rule::unique('jenis_dokumen')->ignore($this->jenisDokumenModel)],
+        ]);
     }
+
+    public function selectRole($role_id)
+    {
+        $this->view[$role_id] = false;
+        $this->upload[$role_id] = false;
+        $this->download[$role_id] = false;
+    }
+
+    // public function resetInput()
+    // {
+    //     $this->jenisDokumenId = "";
+    //     $this->jenis_dokumen = "";
+    //     $this->selectedRoles = [];
+    //     $this->openJenisDocumentModal = false;
+    //     $this->openDeleteJenisDocumentModal = false;
+    //     $this->isEditing = false;
+    //     $this->jenisDokumenModel = "";
+    //     $this->view = "";
+    //     $this->upload = "";
+    //     $this->download = "";
+    // }
 
     public function closeJenisDocumentModal()
     {
         $this->openJenisDocumentModal = false;
         $this->isEditing = false;
         $this->selectedRoles = [];
+        $this->view = null;
+        $this->upload = null;
+        $this->download = null;
     }
 
     public function closeDeleteJenisDocumentModal()
@@ -78,7 +100,7 @@ class ListJenisDocument extends Component
         $jenis_dokumen->delete();
 
         session()->flash('message', "Jenis Dokumen '{$jenis_dokumen->jenis_dokumen}' berhasil Dihapus ! !");
-        $this->resetInput();
+        $this->reset();
     }
 
     public function createJenisDocument()
@@ -87,11 +109,19 @@ class ListJenisDocument extends Component
         $jenis_dokumen_baru = JenisDokumen::create($validatedData);
 
         if (count($this->selectedRoles) > 0) {
-            $jenis_dokumen_baru->roles()->attach($this->selectedRoles);
+            foreach ($this->selectedRoles as $role_id) {
+                // dd($this->view[$role_id]);
+                $jenis_dokumen_baru->roles()
+                    ->attach($role_id, [
+                        'view' => $this->view[$role_id],
+                        'upload' => $this->upload[$role_id],
+                        'download' => $this->download[$role_id]
+                    ]);
+            }
         }
 
         session()->flash('message', "Jenis Dokumen Baru Berhasil Ditambahkan !");
-        $this->resetInput();
+        $this->reset();
     }
 
     public function editJenisDocumentModal(JenisDokumen $jenis_dokumen)
@@ -100,27 +130,44 @@ class ListJenisDocument extends Component
         $this->isEditing = true;
 
         $this->jenisDokumenModel = $jenis_dokumen->loadMissing(['roles']);
-        $this->jenis_dokumen = $jenis_dokumen->jenis_dokumen;
+        $this->jenis_dokumen = $this->jenisDokumenModel->jenis_dokumen;
         $this->selectedRoles = $this->jenisDokumenModel->roles->pluck('id')->toArray();
-        // dd($this->jenisDokumenModel->roles->pluck('id')->toArray());
+        foreach ($this->jenisDokumenModel->roles as $role) {
+            $this->view[$role->id] = $role->pivot->view;
+            $this->upload[$role->id] = $role->pivot->upload;
+            $this->download[$role->id] = $role->pivot->download;
+        }
     }
 
     public function updateJenisDocument()
     {
+        // dd($this->upload);
         $validatedData = $this->validate([
             'jenis_dokumen' => 'required|unique:jenis_dokumen,jenis_dokumen,' . $this->jenisDokumenModel->id
         ]);
 
         $this->jenisDokumenModel->update($validatedData);
-        $this->jenisDokumenModel->roles()->sync($this->selectedRoles);
+        if (count($this->selectedRoles) > 0) {
+            $this->jenisDokumenModel->roles()->detach();
+            foreach ($this->selectedRoles as $role_id) {
+                // var_dump(intval($role_id));
+                $this->jenisDokumenModel->roles()
+                    ->attach($role_id, [
+                        'view' => $this->view[$role_id],
+                        'upload' => $this->upload[$role_id],
+                        'download' => $this->download[$role_id]
+                    ]);
+            }
+        }
+        // // $this->jenisDokumenModel->roles()->sync($this->selectedRoles);
         session()->flash('message', "Jenis Dokumen Berhasil Diperbarui !");
-        $this->resetInput();
+        $this->reset();
     }
 
     public function render()
     {
         $roles = Role::all();
-        $semua_jenis_dokumen = JenisDokumen::with(['roles'])->paginate(10);
+        $semua_jenis_dokumen = JenisDokumen::with('roles')->paginate(10);
         return view('livewire.admin.documents.list-jenis-document', [
             'roles' => $roles,
             'semua_jenis_dokumen' => $semua_jenis_dokumen

@@ -34,13 +34,16 @@
     </div>
     <x-jet-dialog-modal wire:model="openDocumentModal">
         <x-slot name="title">
-            {{ __('Unggah Dokumen Baru') }}
+            @if ($isEditing)
+                {{ __('Edit Dokumen') }}
+            @else
+                {{ __('Unggah Dokumen Baru') }}
+            @endif
         </x-slot>
 
         <x-slot name="content">
-            {{ __('Silahkan isi form berikut.') }}
 
-            <div class="mt-3">
+            <div class="form-group">
                 <x-jet-label for="nama_dokumen">
                     Nama Dokumen
                 </x-jet-label>
@@ -51,7 +54,7 @@
                 <x-jet-input-error for="nama_dokumen" class="mt-2" />
             </div>
 
-            <div class="mt-3">
+            <div class="form-group">
                 <x-jet-label for="jenis_dokumen_id">
                     Jenis Dokumen
                 </x-jet-label>
@@ -66,9 +69,12 @@
                 <x-jet-input-error for="jenis_dokumen_id" class="mt-2" />
             </div>
 
-            <div class="mt-3">
+            <div class="form-group">
                 <x-jet-label for="lampiran">
                     Pilih Lampiran
+                    @if ($isEditing)
+                        (Opsional)
+                    @endif
                 </x-jet-label>
                 <div class="custom-file">
                     {{-- <input type="file" class="custom-file-input" id="customFile"> --}}
@@ -88,10 +94,47 @@
                 {{ __('Batal') }}
             </button>
 
-            <button type="submit" class="btn btn-primary" wire:click="store" wire:loading.attr="disabled">
-                {{ __('Unggah') }}
+            <button type="submit" class="btn btn-primary" wire:click="{{ $isEditing ? 'update' : 'store' }}"
+                wire:loading.attr="disabled">
+                <div wire:loading wire:target="store,update" class="spinner-border spinner-border-sm" role="status">
+                    <span class="visually-hidden"></span>
+                </div>
+
+                @if ($isEditing)
+                    {{ __('Simpan') }}
+                @else
+                    {{ __('Unggah') }}
+                @endif
             </button>
         </x-slot>
 
+    </x-jet-dialog-modal>
+
+    <!-- Delete  Dokumen Confirmation Modal -->
+    <x-jet-dialog-modal wire:model="openDeleteDocumentConfirmation">
+        <x-slot name="title">
+            {{ __("Hapus Dokumen '{$this->nama_dokumen}' ") }}
+        </x-slot>
+
+        <x-slot name="content">
+            {{ __("Anda yakin ingin menghapus dokumen '{$this->nama_dokumen}'?") }}
+            <p class='text-danger font-italic'>
+                {{ __("Aksi ini juga akan menghapus seluruh data yang berhubungan dengan Dokumen '{$this->nama_dokumen}'!!!") }}
+            </p>
+        </x-slot>
+
+        <x-slot name="footer">
+            <x-jet-secondary-button wire:click="closeDocumentModal" wire:loading.attr="disabled">
+                {{ __('Batal') }}
+            </x-jet-secondary-button>
+
+            <x-jet-danger-button wire:click="delete" wire:loading.attr="disabled">
+                <div wire:loading wire:target="delete" class="spinner-border spinner-border-sm" role="status">
+                    <span class="visually-hidden"></span>
+                </div>
+
+                {{ __('Hapus') }}
+            </x-jet-danger-button>
+        </x-slot>
     </x-jet-dialog-modal>
 </div>

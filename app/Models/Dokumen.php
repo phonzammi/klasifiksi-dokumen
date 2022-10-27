@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
+use Carbon\Carbon;
 
 class Dokumen extends Model
 {
@@ -14,6 +15,18 @@ class Dokumen extends Model
     protected $fillable = ['nama_dokumen', 'jenis_dokumen_id', 'user_id', 'lampiran'];
 
     protected $appends = ['lampiran_url'];
+
+    public function getCreatedAtAttribute($datetime)
+    {
+        $created_at = new Carbon($datetime);
+        return $created_at->isoFormat('dddd, D MMM Y. HH:MM');
+    }
+
+    public function getUpdatedAtAttribute($datetime)
+    {
+        $updated_at = new Carbon($datetime);
+        return $updated_at->isoFormat('dddd, D MMM Y. HH:MM');
+    }
 
     public function getLampiranUrlAttribute()
     {

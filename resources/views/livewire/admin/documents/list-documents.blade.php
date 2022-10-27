@@ -12,96 +12,73 @@
     </x-slot>
 
     <div class="container-fluid">
-        @if (session()->has('message'))
+        {{-- @if (session()->has('message'))
             <div class="alert alert-success alert-dismissible fade show" role="alert">
                 <strong><i class="fa fa-check-circle mr-1"></i> Success!</strong> {{ session('message') }}
                 <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
-        @endif
-        <div class="row">
-            <div class="col-lg-12">
-                <div class="d-flex justify-content-end mb-1">
-                    <button wire:click="createDocumentModal" class="btn btn-primary mr-1" wire:loading.attr="disabled">
-                        <i class="fas fa-file-upload"></i>
-                        Unggah Dokumen
-                    </button>
-                </div>
-                <div class="card">
-                    <div class="card-body">
-                        <div class="table-responsive">
-                            <table class="table table-hover">
-                                <thead>
-                                    <tr>
-                                        <th scope="col">No.</th>
-                                        <th scope="col">Nama Dokumen</th>
-                                        <th scope="col">Jenis Dokumen</th>
-                                        <th scope="col">Diunggah Oleh</th>
-                                        <th scope="col">#Aksi</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @forelse ($semua_dokumen as $index => $dokumen)
-                                        <tr>
-                                            <th scope="row">{{ $semua_dokumen->firstItem() + $index }}</th>
-                                            <td>{{ $dokumen->nama_dokumen }}</td>
-                                            <td>{{ $dokumen->jenis_dokumen->jenis_dokumen }}</td>
-                                            <td>{{ $dokumen->uploaded_by->name }}
-                                                ({{ $dokumen->uploaded_by->is_admin ? 'Admin' : '' }})
-                                            </td>
-                                            <td>
-                                                <a href="#">
-                                                    <i class="far fa-edit mr-1"></i>
-                                                </a>
-                                                <a href="#">
-                                                    <i class="fas fa-trash text-danger"></i>
-                                                </a>
-                                            </td>
-                                        </tr>
-                                    @empty
-                                        <tr>
-                                            <td colspan="5" class="text-center">
-                                                <i class='text-danger'>Tidak ada dokumen</i>
-                                            </td>
-                                        </tr>
-                                    @endforelse
-                                </tbody>
-                            </table>
+        @endif --}}
+
+        <div class="row justify-content-center">
+            <div class="col">
+                <div class="card border">
+                    <div class="card-header d-flex justify-content-between">
+                        <div class="mr-auto my-auto">
+                            <i class="fas fa-table me-1"></i>
+                            {{ __('Seluruh Dokumen') }}
+                        </div>
+
+                        <div class="my-auto">
+                            <button wire:click="createDocumentModal" class="btn btn-sm btn-primary mr-1"
+                                wire:loading.attr="disabled">
+                                <i class="fas fa-file-upload"></i>
+                                Unggah Dokumen Baru
+                            </button>
                         </div>
                     </div>
-                    <div class="card-footer d-flex justify-content-end">
-                        {{ $semua_dokumen->links() }}
+
+                    <div class="card-body">
+                        @if (session()->has('message'))
+                            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                                <strong><i class="fa fa-check-circle mr-1"></i> Success!</strong>
+                                {{ session('message') }}
+                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                        @endif
+                        <livewire:admin.datatable.documents-table />
                     </div>
                 </div>
-
-
             </div>
-            <!-- /.col-md-6 -->
         </div>
         <!-- /.row -->
     </div><!-- /.container-fluid -->
 
     <x-jet-dialog-modal wire:model="openDocumentModal">
         <x-slot name="title">
-            {{ __('Unggah Dokumen Baru') }}
+            @if ($isEditing)
+                {{ __('Edit Dokumen') }}
+            @else
+                {{ __('Unggah Dokumen Baru') }}
+            @endif
         </x-slot>
 
         <x-slot name="content">
-            {{ __('Silahkan isi form berikut.') }}
-
-            <div class="mt-3 w-md-75">
+            <div class="form-group">
                 <x-jet-label for="nama_dokumen">
                     Nama Dokumen
                 </x-jet-label>
                 <x-jet-input type='text' placeholder="{{ __('Nama Dokumen') }}"
-                    class="{{ $errors->has('nama_dokumen') ? 'is-invalid' : '' }}" wire:model.defer="nama_dokumen"
-                    wire:keydown.enter="storeDocument" />
+                    class="{{ $errors->has('nama_dokumen') ? 'is-invalid' : '' }}"
+                    wire:model.debounce.500ms="nama_dokumen" wire:keydown.enter="storeDocument" />
 
                 <x-jet-input-error for="nama_dokumen" class="mt-2" />
             </div>
 
-            <div class="mt-3 w-md-75">
+            <div class="form-group">
                 <x-jet-label for="jenis_dokumen_id">
                     Jenis Dokumen
                 </x-jet-label>
@@ -116,13 +93,16 @@
                 <x-jet-input-error for="jenis_dokumen_id" class="mt-2" />
             </div>
 
-            <div class="mt-3 w-md-75">
+            <div class="form-group">
                 <x-jet-label for="lampiran">
                     Pilih Lampiran
+                    @if ($isEditing)
+                        (Opsional)
+                    @endif
                 </x-jet-label>
                 <div class="custom-file">
                     {{-- <input type="file" class="custom-file-input" id="customFile"> --}}
-                    <x-jet-input type='file' wire:model.defer="lampiran" id="customFile"
+                    <x-jet-input type='file' wire:model.debounce.500ms="lampiran" id="customFile"
                         class="custom-file-input {{ $errors->has('lampiran') ? 'is-invalid' : '' }}" accept=".pdf" />
                     <label class="custom-file-label"
                         for="customFile">{{ $lampiran ? $lampiran->getClientOriginalName() : 'Pilih Lampiran' }}</label>
@@ -134,14 +114,48 @@
         </x-slot>
 
         <x-slot name="footer">
-            <button class="btn btn-danger" wire:click="$toggle('openDocumentModal')" wire:loading.attr="disabled">
+            <button class="btn btn-danger" wire:click="closeDocumentModal" wire:loading.attr="disabled">
                 {{ __('Batal') }}
             </button>
 
-            <button type="submit" class="btn btn-primary" wire:click="storeDocument" wire:loading.attr="disabled">
-                {{ __('Unggah') }}
+            <button type="submit" class="btn btn-primary"
+                wire:click="{{ $isEditing ? 'updateDocument' : 'storeDocument' }}" wire:loading.attr="disabled">
+
+                @if ($isEditing)
+                    {{ __('Simpan') }}
+                @else
+                    {{ __('Unggah') }}
+                @endif
             </button>
         </x-slot>
 
+    </x-jet-dialog-modal>
+
+    <!-- Delete  Dokumen Confirmation Modal -->
+    <x-jet-dialog-modal wire:model="openDeleteDocumentConfirmation">
+        <x-slot name="title">
+            {{ __("Hapus Dokumen '{$this->nama_dokumen}' ") }}
+        </x-slot>
+
+        <x-slot name="content">
+            {{ __("Anda yakin ingin menghapus dokumen '{$this->nama_dokumen}'?") }}
+            <p class='text-danger font-italic'>
+                {{ __("Aksi ini juga akan menghapus seluruh data yang berhubungan dengan Dokumen '{$this->nama_dokumen}'!!!") }}
+            </p>
+        </x-slot>
+
+        <x-slot name="footer">
+            <x-jet-secondary-button wire:click="closeDocumentModal" wire:loading.attr="disabled">
+                {{ __('Batal') }}
+            </x-jet-secondary-button>
+
+            <x-jet-danger-button wire:click="deleteDocument" wire:loading.attr="disabled">
+                <div wire:loading wire:target="deleteDocument" class="spinner-border spinner-border-sm" role="status">
+                    <span class="visually-hidden"></span>
+                </div>
+
+                {{ __('Hapus') }}
+            </x-jet-danger-button>
+        </x-slot>
     </x-jet-dialog-modal>
 </div>

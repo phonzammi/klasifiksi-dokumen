@@ -20,6 +20,7 @@ class UserDocumentsTable extends DataTableComponent
         $this->setPrimaryKey('id')
             ->setSingleSortingDisabled();
         $this->setDefaultSort('id', 'asc');
+        $this->setAdditionalSelects(['lampiran', 'jenis_dokumen', 'user_id', 'jenis_dokumen_id']);
     }
 
     public function columns(): array
@@ -35,31 +36,27 @@ class UserDocumentsTable extends DataTableComponent
                 ->sortable()
                 ->searchable(),
             Column::make("Jenis Dokumen", "jenis_dokumen.jenis_dokumen")
-                ->sortable()
+                ->sortable(
+                    fn (Builder $query, string $direction) => $query->orderBy('jenis_dokumen.jenis_dokumen', $direction)
+                )
                 ->searchable(),
-            Column::make("Diupload Oleh", "uploaded_by.name"),
-            LinkColumn::make('Aksi', 'lampiran_url')
-                ->title(fn ($row) => "Unduh")
-                ->location(fn ($row) => $row->lampiran_url)
-                ->attributes(fn ($row) => [
-                    'class' => 'btn btn-sm btn-success',
-                    'alt' => 'Lampiran ' . $row->nama_dokumen,
-                ]),
-            // ButtonGroupColumn::make('Aksi')
-            //     ->attributes(function ($row) {
-            //         return [
-            //             'class' => 'mx-auto',
-            //         ];
-            //     })
-            //     ->buttons([
-            //         LinkColumn::make('Aksi', 'lampiran_url')
-            //             ->title(fn ($row) => "Unduh")
-            //             ->location(fn ($row) => $row->lampiran_url)
-            //             ->attributes(fn ($row) => [
-            //                 'class' => 'btn btn-sm btn-success',
-            //                 'alt' => 'Lampiran ' . $row->nama_dokumen,
-            //             ]),
+            Column::make("Diupload Oleh", "uploaded_by.name")
+                ->sortable(
+                    fn (Builder $query, string $direction) => $query->orderBy('users.name', $direction)
+                )
+                ->searchable(),
+            Column::make("Aksi")
+                ->label(
+                    fn ($row, Column $column) => view('livewire.users.tables.cells.actions')->withRow($row)
+                ),
+            // LinkColumn::make('Aksi', 'lampiran_url')
+            //     ->title(fn ($row) => "Unduh")
+            //     ->location(fn ($row) => $row->lampiran_url)
+            //     ->attributes(fn ($row) => [
+            //         'class' => 'btn btn-sm btn-success',
+            //         'alt' => 'Lampiran ' . $row->nama_dokumen,
             //     ]),
+
         ];
     }
 
@@ -69,7 +66,7 @@ class UserDocumentsTable extends DataTableComponent
             MultiSelectFilter::make('Jenis Dokumen')
                 ->options(
                     JenisDokumen::query()
-                        ->whereHas('roles', function ($query) {
+                        ->whereHas('roles_can_view', function ($query) {
                             $query->where('role_id', auth()->user()->role_id);
                         })
                         ->orderBy('jenis_dokumen')
@@ -86,9 +83,11 @@ class UserDocumentsTable extends DataTableComponent
     public function builder(): Builder
     {
         return Dokumen::query()
-            ->whereHas('jenis_dokumen.roles', function ($query) {
+            ->with([
+                'uploaded_by'
+            ])
+            ->whereHas('jenis_dokumen.roles_can_view', function ($query) {
                 $query->where('role_jenis_dokumen.role_id', auth()->user()->role_id);
-            })
-            ->select('dokumen.id', 'nama_dokumen', 'jenis_dokumen.jenis_dokumen', 'users.name', 'dokumen.created_at', 'lampiran');
+            });
     }
 }
