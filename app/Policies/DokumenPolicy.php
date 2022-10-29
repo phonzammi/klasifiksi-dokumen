@@ -60,7 +60,8 @@ class DokumenPolicy
     public function download(?User $user, Dokumen $dokumen)
     {
         $jenisDokumen = JenisDokumen::with('roles_can_download')->find($dokumen->jenis_dokumen_id);
-        return in_array(auth()->check() && auth()->user()->role_id, $jenisDokumen->roles_can_download->pluck('id')->toArray()) || (auth()->check() && auth()->user()->id == $dokumen->user_id);
+
+        return in_array(auth()->user()->role_id, $jenisDokumen->roles_can_download->pluck('id')->toArray()) || (auth()->check() && auth()->user()->id == $dokumen->user_id);
     }
 
     /**
