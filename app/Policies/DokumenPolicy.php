@@ -46,7 +46,7 @@ class DokumenPolicy
     }
 
     /**
-     * Determine whether the user can update the model.
+     * Menentukan apakah user dapat memperbarui dokumen.
      *
      * @param  \App\Models\User  $user
      * @param  \App\Models\Dokumen  $dokumen
@@ -65,7 +65,7 @@ class DokumenPolicy
     }
 
     /**
-     * Determine whether the user can delete the model.
+     * Menentukan apakah user dapat menghapus dokumen.
      *
      * @param  \App\Models\User  $user
      * @param  \App\Models\Dokumen  $dokumen

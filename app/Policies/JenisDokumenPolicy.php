@@ -34,7 +34,7 @@ class JenisDokumenPolicy
     }
 
     /**
-     * Determine whether the user can create models.
+     * Menentukan apakah user dapat mengunggah dokumen berdasarkan hak akses jenis dokumen.
      *
      * @param  \App\Models\User  $user
      * @return \Illuminate\Auth\Access\Response|bool

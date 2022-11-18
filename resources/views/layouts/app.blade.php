@@ -14,6 +14,9 @@
 
     <!-- Styles -->
     <link rel="stylesheet" href="{{ mix('css/dashboard.css') }}">
+
+    <!-- Ionicons -->
+    <link rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
     @livewireStyles
 
     <!-- Scripts -->
