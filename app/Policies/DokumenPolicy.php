@@ -64,13 +64,6 @@ class DokumenPolicy
         return in_array(auth()->user()->role_id, $jenisDokumen->roles_can_download->pluck('id')->toArray()) || (auth()->check() && auth()->user()->id == $dokumen->user_id);
     }
 
-    /**
-     * Menentukan apakah user dapat menghapus dokumen.
-     *
-     * @param  \App\Models\User  $user
-     * @param  \App\Models\Dokumen  $dokumen
-     * @return \Illuminate\Auth\Access\Response|bool
-     */
     public function delete(?User $user, Dokumen $dokumen)
     {
         return auth()->user()->id == $dokumen->user_id;

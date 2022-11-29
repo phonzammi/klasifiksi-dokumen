@@ -73,6 +73,36 @@
                 </div>
 
                 <div class="form-group">
+                    <x-jet-label for="jurusan_id">Jurusan :</x-jet-label>
+
+                    <select id="jurusan_id" wire:model="selectedJurusan"
+                        class="custom-select @error('jurusan_id') is-invalid @enderror">
+                        <option value="">Pilih Jurusan ...</option>
+                        @foreach ($seluruh_jurusan as $jurusan)
+                            <option value="{{ $jurusan->id }}">{{ $jurusan->nama_jurusan }}</option>
+                        @endforeach
+                    </select>
+
+                    <x-jet-input-error for="jurusan_id" class="mt-2" />
+                </div>
+
+                @if (!is_null($selectedJurusan))
+                    <div class="form-group">
+                        <x-jet-label for="prodi_id">Prodi :</x-jet-label>
+
+                        <select id="prodi_id" wire:model="prodi_id"
+                            class="custom-select @error('prodi_id') is-invalid @enderror">
+                            <option value="">Pilih Prodi ...</option>
+                            @foreach ($seluruh_prodi as $prodi)
+                                <option value="{{ $prodi->id }}">{{ $prodi->nama_prodi }}</option>
+                            @endforeach
+                        </select>
+
+                        <x-jet-input-error for="prodi_id" class="mt-2" />
+                    </div>
+                @endif
+
+                <div class="form-group">
                     <x-jet-label for="role_id">Hak Akses (Jabatan) :</x-jet-label>
 
                     <select id="role_id" wire:model.lazy="role_id"

@@ -29,6 +29,7 @@ class User extends Authenticatable
         'email',
         'password',
         'role_id',
+        'prodi_id'
     ];
 
     public function role()
@@ -44,6 +45,11 @@ class User extends Authenticatable
     public function documents()
     {
         return $this->hasMany(Dokumen::class, 'user_id');
+    }
+
+    public function prodi()
+    {
+        return $this->belongsTo(Prodi::class, 'prodi_id');
     }
 
     /**

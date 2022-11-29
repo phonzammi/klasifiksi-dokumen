@@ -28,11 +28,11 @@ class Dokumen extends Model
         return $updated_at->isoFormat('dddd, D MMM Y. HH:MM');
     }
 
-    // public function getLampiranUrlAttribute()
-    // {
-    //     $lampiran_url = Storage::disk(config('public'))->url("lampiran/{$this->jenis_dokumen}/{$this->lampiran}");
-    //     return $lampiran_url;
-    // }
+    public function getLampiranUrlAttribute()
+    {
+        $lampiran_url = Storage::disk(config('public'))->url("lampiran/{$this->jenis_dokumen}/{$this->lampiran}");
+        return $lampiran_url;
+    }
 
     public function scopeSearch($query, $term)
     {

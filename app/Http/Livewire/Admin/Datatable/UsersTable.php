@@ -17,7 +17,7 @@ class UsersTable extends DataTableComponent
     {
         $this->setPrimaryKey('id');
         $this->setEagerLoadAllRelationsEnabled();
-        // $this->setAdditionalSelects(['users.role_id']);
+        // $this->setAdditionalSelects(['users.prodi']);
     }
 
     public function columns(): array
@@ -32,6 +32,16 @@ class UsersTable extends DataTableComponent
                 ->searchable(),
             Column::make("Alamat Email", "email")
                 ->sortable()
+                ->searchable(),
+            Column::make("Prodi", "prodi.nama_prodi")
+                ->sortable(
+                    fn (Builder $query, string $direction) => $query->orderBy('prodi.nama_prodi', $direction)
+                )
+                ->searchable(),
+            Column::make("Jurusan", "prodi.jurusan.nama_jurusan")
+                ->sortable(
+                    fn (Builder $query, string $direction) => $query->orderBy('jurusan.nama_jurusan', $direction)
+                )
                 ->searchable(),
             Column::make("Hak Akses (Jabatan)", 'role_id')
                 // ->label(
@@ -76,6 +86,11 @@ class UsersTable extends DataTableComponent
     {
         return User::query()
             ->where('is_admin', 0)
-            ->with('role');
+            ->with([
+                'role',
+                'prodi' => function ($query) {
+                    $query->with('jurusan');
+                }
+            ]);
     }
 }
