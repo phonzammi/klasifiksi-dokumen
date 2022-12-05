@@ -37,12 +37,18 @@ class UsersTable extends DataTableComponent
                 ->sortable(
                     fn (Builder $query, string $direction) => $query->orderBy('prodi.nama_prodi', $direction)
                 )
-                ->searchable(),
+                ->searchable()
+                ->format(
+                    fn ($value, $row, Column $column) => $row["prodi.nama_prodi"] ? $row["prodi.nama_prodi"] : '<span class="badge badge-danger">Tidak Tersedia</span>'
+                )->html(),
             Column::make("Jurusan", "prodi.jurusan.nama_jurusan")
                 ->sortable(
                     fn (Builder $query, string $direction) => $query->orderBy('jurusan.nama_jurusan', $direction)
                 )
-                ->searchable(),
+                ->searchable()
+                ->format(
+                    fn ($value, $row, Column $column) => $row["prodi.jurusan.nama_jurusan"] ? $row["prodi.jurusan.nama_jurusan"] : '<span class="badge badge-danger">Tidak Tersedia</span>'
+                )->html(),
             Column::make("Hak Akses (Jabatan)", 'role_id')
                 // ->label(
                 //     fn ($row, Column $column)  => $row->role_id == 1 ? '<span class="badge badge-primary">' . $row->role->role_name . '</span>' : '<span class="badge badge-success">' . $row->role->role_name . '</span>'

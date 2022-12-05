@@ -23,6 +23,8 @@ class ListDocuments extends Component
     public $isEditing = false;
     public $openDeleteDocumentConfirmation = false;
 
+    public $jenis_dokumen = NULL;
+
     protected $listeners = ['editDocumentModal', 'deleteDocumentConfirmation', 'closeModal' => 'closeDocumentModal'];
 
     public function resetInput()
@@ -37,7 +39,7 @@ class ListDocuments extends Component
 
     public function updated($fields)
     {
-        $this->nama_dokumen = Str::title($this->nama_dokumen);
+        // $this->nama_dokumen = Str::title($this->nama_dokumen);
 
         $this->validateOnly($fields, [
             'nama_dokumen' => ['required', Rule::unique('dokumen')->ignore($this->dokumenModel)],
@@ -76,24 +78,23 @@ class ListDocuments extends Component
             'lampiran' => 'required|mimes:pdf|max:2048'
         ]);
 
-        $jenis_dokumen = JenisDokumen::find($validated['jenis_dokumen_id']);
+        // $jenis_dokumen = JenisDokumen::find($validated['jenis_dokumen_id']);
 
-        $this->authorize('create', $jenis_dokumen);
+        $this->authorize('create', $this->jenis_dokumen);
 
         $nama_lampiran = Str::slug($validated['nama_dokumen']) . "." . $this->lampiran->extension();
 
         $dokumen_baru = new Dokumen();
         $dokumen_baru->nama_dokumen = $validated['nama_dokumen'];
-        $dokumen_baru->jenis_dokumen_id = $jenis_dokumen->id;
+        $dokumen_baru->jenis_dokumen_id = $this->jenis_dokumen->id;
         $dokumen_baru->user_id = auth()->user()->id;
         $dokumen_baru->lampiran = $nama_lampiran;
 
         if ($dokumen_baru->save()) {
-            $this->lampiran->storeAs("lampiran/{$jenis_dokumen->jenis_dokumen}", $nama_lampiran, 'public');
+            $this->lampiran->storeAs("lampiran/{$this->jenis_dokumen->jenis_dokumen}", $nama_lampiran, 'public');
         };
 
         session()->flash('message', "Dokumen Baru : '{$dokumen_baru->nama_dokumen}' Berhasil Di Upload !");
-        // $this->resetInput();
         $this->emit('refreshDatatable');
         $this->reset();
     }
@@ -108,6 +109,7 @@ class ListDocuments extends Component
         $this->dokumenModel = $dokumen;
         $this->nama_dokumen = $this->dokumenModel->nama_dokumen;
         $this->jenis_dokumen_id = $this->dokumenModel->jenis_dokumen_id;
+        $this->updatedNamaDokumen($this->nama_dokumen);
     }
 
     public function update()
@@ -180,5 +182,22 @@ class ListDocuments extends Component
         })->orderBy('jenis_dokumen')->get();
         return view('livewire.users.documents.list-documents', compact('semua_jenis_dokumen'))
             ->layout('layouts.users');
+    }
+
+    public function updatedNamaDokumen($nama_dokumen)
+    {
+        $this->nama_dokumen = Str::title($this->nama_dokumen);
+        $string = explode(" ", $this->nama_dokumen);
+
+        // dd($string);
+        $this->jenis_dokumen = JenisDokumen::whereHas('roles_can_upload', function ($query) {
+            $query->where('role_id', auth()->user()->role_id);
+        })->where('jenis_dokumen', 'like', "%{$string[0]}%")->first();
+
+        $this->jenis_dokumen_id = $this->jenis_dokumen ? $this->jenis_dokumen->id : "";
+        if ($nama_dokumen == "") {
+            $this->jenis_dokumen = NULL;
+            $this->jenis_dokumen_id = "";
+        }
     }
 }

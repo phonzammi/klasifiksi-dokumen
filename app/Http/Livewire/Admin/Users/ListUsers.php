@@ -179,5 +179,9 @@ class ListUsers extends Component
     {
         $this->seluruh_prodi = Prodi::where('jurusan_id', $jurusan)->get();
         $this->selectedProdi = NULL;
+        $this->prodi_id = "";
+        if (!$jurusan) {
+            $this->selectedJurusan = NULL;
+        }
     }
 }
