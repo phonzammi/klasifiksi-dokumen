@@ -9,27 +9,25 @@ use Livewire\Component;
 use Livewire\WithFileUploads;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
-use Livewire\WithPagination;
 
 class ListDocuments extends Component
 {
-    // use WithPagination;
     use WithFileUploads;
-
-    // protected $paginationTheme = 'bootstrap';
 
     public $nama_dokumen, $jenis_dokumen_id, $lampiran, $dokumenModel;
     public $openDocumentModal = false;
     public $isEditing = false;
     public $openDeleteDocumentConfirmation = false;
 
+    public $jenis_dokumen = NULL;
+
     protected $listeners = ['editDocumentModal', 'deleteDocumentConfirmation', 'closeModal' => 'closeDocumentModal'];
 
-    protected $rules = [
-        'nama_dokumen' => 'required|unique:dokumen,nama_dokumen',
-        'jenis_dokumen_id' => 'required|numeric',
-        'lampiran' => 'required|mimes:pdf|max:2048'
-    ];
+    // protected $rules = [
+    //     'nama_dokumen' => 'required|unique:dokumen,nama_dokumen',
+    //     'jenis_dokumen_id' => 'required|numeric',
+    //     'lampiran' => 'required|mimes:pdf|max:2048'
+    // ];
 
     protected $validationAttributes = [
         'nama_dokumen' => 'Nama Dokumen',
@@ -39,7 +37,7 @@ class ListDocuments extends Component
 
     public function updated($fields)
     {
-        $this->nama_dokumen = Str::title($this->nama_dokumen);
+        // $this->nama_dokumen = Str::title($this->nama_dokumen);
 
         $this->validateOnly($fields, [
             'nama_dokumen' => ['required', Rule::unique('dokumen')->ignore($this->dokumenModel)],
@@ -67,20 +65,24 @@ class ListDocuments extends Component
 
     public function storeDocument()
     {
-        $validatedData = $this->validate();
+        $validatedData = $this->validate([
+            'nama_dokumen' => 'required|unique:dokumen,nama_dokumen',
+            'jenis_dokumen_id' => 'required|numeric',
+            'lampiran' => 'required|mimes:pdf|max:2048'
+        ]);
 
-        $jenis_dokumen = JenisDokumen::find($validatedData['jenis_dokumen_id']);
+        // $jenis_dokumen = JenisDokumen::find($validatedData['jenis_dokumen_id']);
 
         $nama_lampiran = Str::slug($validatedData['nama_dokumen']) . "." . $this->lampiran->extension();
 
         $dokumen_baru = new Dokumen();
         $dokumen_baru->nama_dokumen = $validatedData['nama_dokumen'];
-        $dokumen_baru->jenis_dokumen_id = $jenis_dokumen->id;
+        $dokumen_baru->jenis_dokumen_id = $this->jenis_dokumen->id;
         $dokumen_baru->user_id = auth()->user()->id;
         $dokumen_baru->lampiran = $nama_lampiran;
 
         if ($dokumen_baru->save()) {
-            $this->lampiran->storeAs("lampiran/{$jenis_dokumen->jenis_dokumen}", $nama_lampiran, 'public');
+            $this->lampiran->storeAs("lampiran/{$this->jenis_dokumen->jenis_dokumen}", $nama_lampiran, 'public');
         }
 
         session()->flash('message', "Dokumen Baru : '{$dokumen_baru->nama_dokumen}' Berhasil Di Upload !");
@@ -95,6 +97,7 @@ class ListDocuments extends Component
         $this->dokumenModel = $dokumen;
         $this->nama_dokumen = $this->dokumenModel->nama_dokumen;
         $this->jenis_dokumen_id = $this->dokumenModel->jenis_dokumen_id;
+        $this->updatedNamaDokumen($this->nama_dokumen);
     }
 
     public function updateDocument()
@@ -171,5 +174,23 @@ class ListDocuments extends Component
         $semua_jenis_dokumen = JenisDokumen::all();
         $semua_dokumen = Dokumen::with(['jenis_dokumen', 'uploaded_by'])->latest()->paginate(5);
         return view('livewire.admin.documents.list-documents', compact('semua_jenis_dokumen', 'semua_dokumen'));
+    }
+
+    public function updatedNamaDokumen($nama_dokumen)
+    {
+        $this->nama_dokumen = Str::title($this->nama_dokumen);
+        $search = explode(" ", $this->nama_dokumen);
+
+        $this->jenis_dokumen = JenisDokumen::where('jenis_dokumen', 'like', "%{$this->nama_dokumen}%")->first();
+
+        if (!$this->jenis_dokumen && $search[1]) {
+            $this->jenis_dokumen = JenisDokumen::where('jenis_dokumen', 'like', "%{$search[0]} {$search[1]}%")->first();
+        }
+
+        $this->jenis_dokumen_id = $this->jenis_dokumen ? $this->jenis_dokumen->id : "";
+        if ($nama_dokumen == "") {
+            $this->jenis_dokumen = NULL;
+            $this->jenis_dokumen_id = "";
+        }
     }
 }

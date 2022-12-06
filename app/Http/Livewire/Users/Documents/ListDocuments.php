@@ -187,12 +187,17 @@ class ListDocuments extends Component
     public function updatedNamaDokumen($nama_dokumen)
     {
         $this->nama_dokumen = Str::title($this->nama_dokumen);
-        $string = explode(" ", $this->nama_dokumen);
+        $search = explode(" ", $this->nama_dokumen);
 
-        // dd($string);
         $this->jenis_dokumen = JenisDokumen::whereHas('roles_can_upload', function ($query) {
             $query->where('role_id', auth()->user()->role_id);
-        })->where('jenis_dokumen', 'like', "%{$string[0]}%")->first();
+        })->where('jenis_dokumen', 'like', "%{$this->nama_dokumen}%")->first();
+
+        if (!$this->jenis_dokumen && $search[1]) {
+            $this->jenis_dokumen = JenisDokumen::whereHas('roles_can_upload', function ($query) {
+                $query->where('role_id', auth()->user()->role_id);
+            })->where('jenis_dokumen', 'like', '%' . $search[0] . " " . $search[1] . '%')->first();
+        }
 
         $this->jenis_dokumen_id = $this->jenis_dokumen ? $this->jenis_dokumen->id : "";
         if ($nama_dokumen == "") {

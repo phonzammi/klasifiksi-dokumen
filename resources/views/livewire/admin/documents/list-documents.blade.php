@@ -82,6 +82,27 @@
                 <x-jet-label for="jenis_dokumen_id">
                     Jenis Dokumen
                 </x-jet-label>
+                @if ($nama_dokumen == '')
+                    <x-jet-input type='text'
+                        class="bg-white fst-normal {{ $errors->has('nama_dokumen') ? 'is-invalid' : '' }}"
+                        placeholder="{{ __('Isi Nama Dokumen Terlebih Dahulu ...') }}" readonly />
+                @elseif(!$nama_dokumen == '' && !is_null($jenis_dokumen))
+                    <x-jet-input type='hidden' wire:model.debounce.500ms='jenis_dokumen_id' />
+                    <x-jet-input type='text' class="border border-success bg-white fw-bold"
+                        placeholder="{{ $jenis_dokumen->jenis_dokumen }}" readonly />
+                @elseif ($nama_dokumen && is_null($jenis_dokumen))
+                    <x-jet-input style="color: red" type='text'
+                        class="border border-danger bg-white fst-normal is-invalid"
+                        value="{{ __('Jenis Dokumen Tidak Tersedia/Tidak Berwenang') }}" readonly />
+                @endif
+
+                <x-jet-input-error for="jenis_dokumen_id" class="mt-2" />
+            </div>
+
+            {{-- <div class="form-group">
+                <x-jet-label for="jenis_dokumen_id">
+                    Jenis Dokumen
+                </x-jet-label>
                 <select id="jenis_dokumen_id" wire:model.lazy="jenis_dokumen_id"
                     class="custom-select {{ $errors->has('jenis_dokumen_id') ? 'is-invalid' : '' }}">
                     <option value="">Pilih Jenis Dokumen ...</option>
@@ -91,7 +112,7 @@
                 </select>
 
                 <x-jet-input-error for="jenis_dokumen_id" class="mt-2" />
-            </div>
+            </div> --}}
 
             <div class="form-group">
                 <x-jet-label for="lampiran">
