@@ -39,8 +39,11 @@ class ListDocuments extends Component
 
     public function updated($fields)
     {
-        // $this->nama_dokumen = Str::title($this->nama_dokumen);
-
+        $this->nama_dokumen = Str::title($this->nama_dokumen);
+        if ($this->nama_dokumen == "") {
+            $this->jenis_dokumen = NULL;
+            $this->jenis_dokumen_id = "";
+        }
         $this->validateOnly($fields, [
             'nama_dokumen' => ['required', Rule::unique('dokumen')->ignore($this->dokumenModel)],
             'jenis_dokumen_id' => 'required|numeric',
@@ -186,29 +189,40 @@ class ListDocuments extends Component
 
     public function updatedNamaDokumen($nama_dokumen)
     {
-        $this->nama_dokumen = Str::title($this->nama_dokumen);
         $search = explode(" ", $this->nama_dokumen);
 
-        // dd(!array_key_exists(1, $search));
+        $jenis_dokumen_count = JenisDokumen::whereHas('roles_can_upload', function ($query) {
+            $query->where('role_id', auth()->user()->role_id);
+        })->where('jenis_dokumen', 'like', '%' . $search[0] . '%')->count();
 
-        if (!array_key_exists(1, $search)) {
-            $this->jenis_dokumen = JenisDokumen::whereHas('roles_can_upload', function ($query) {
-                $query->where('role_id', auth()->user()->role_id);
-            })->where('jenis_dokumen', 'like', '%' . $search[0] . '%')->first();
-        } else {
-            $this->jenis_dokumen = NULL;
+        if ($jenis_dokumen_count == 1) {
+            if (!array_key_exists(1, $search)) {
+                $this->jenis_dokumen = JenisDokumen::whereHas('roles_can_upload', function ($query) {
+                    $query->where('role_id', auth()->user()->role_id);
+                })->where('jenis_dokumen', 'like', '%' . $search[0] . '%')->first();
+            }
+            if (array_key_exists(1, $search)) {
+                $this->jenis_dokumen = JenisDokumen::whereHas('roles_can_upload', function ($query) {
+                    $query->where('role_id', auth()->user()->role_id);
+                })
+                    ->where('jenis_dokumen', 'like', '%' . $search[0])
+                    ->orWhere('jenis_dokumen', 'like', "%{$search[0]} {$search[1]}%")->first();
+            }
         }
 
-        if (!$this->jenis_dokumen && array_key_exists(1, $search)) {
-            $this->jenis_dokumen = JenisDokumen::whereHas('roles_can_upload', function ($query) {
-                $query->where('role_id', auth()->user()->role_id);
-            })->where('jenis_dokumen', 'like', '%' . $search[0] . " " . $search[1] . '%')->first();
+        if ($jenis_dokumen_count > 1) {
+            if (!array_key_exists(1, $search)) {
+                $this->jenis_dokumen = JenisDokumen::whereHas('roles_can_upload', function ($query) {
+                    $query->where('role_id', auth()->user()->role_id);
+                })->where('jenis_dokumen', 'like', '%' . $search[0] . '%')->first();
+            }
+            if (array_key_exists(1, $search)) {
+                $this->jenis_dokumen = JenisDokumen::whereHas('roles_can_upload', function ($query) {
+                    $query->where('role_id', auth()->user()->role_id);
+                })->where('jenis_dokumen', 'like', '%' . $search[0] . " " . $search[1] . '%')->first();
+            }
         }
 
         $this->jenis_dokumen_id = $this->jenis_dokumen ? $this->jenis_dokumen->id : "";
-        if ($nama_dokumen == "") {
-            $this->jenis_dokumen = NULL;
-            $this->jenis_dokumen_id = "";
-        }
     }
 }

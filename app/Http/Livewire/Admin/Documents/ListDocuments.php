@@ -37,8 +37,11 @@ class ListDocuments extends Component
 
     public function updated($fields)
     {
-        // $this->nama_dokumen = Str::title($this->nama_dokumen);
-
+        $this->nama_dokumen = Str::title($this->nama_dokumen);
+        if ($this->nama_dokumen == "") {
+            $this->jenis_dokumen = NULL;
+            $this->jenis_dokumen_id = "";
+        }
         $this->validateOnly($fields, [
             'nama_dokumen' => ['required', Rule::unique('dokumen')->ignore($this->dokumenModel)],
             'jenis_dokumen_id' => 'required|numeric',
@@ -176,26 +179,30 @@ class ListDocuments extends Component
         return view('livewire.admin.documents.list-documents', compact('semua_jenis_dokumen', 'semua_dokumen'));
     }
 
-    public function updatedNamaDokumen($nama_dokumen)
+    public function updatedNamaDokumen()
     {
-        $this->nama_dokumen = Str::title($this->nama_dokumen);
         $search = explode(" ", $this->nama_dokumen);
 
-        if (!array_key_exists(1, $search)) {
-            $this->jenis_dokumen = JenisDokumen::where('jenis_dokumen', 'like', '%' . $search[0] . '%')->first();
-        } else {
-            $this->jenis_dokumen = NULL;
+        $jenis_dokumen_count = JenisDokumen::where('jenis_dokumen', 'like', '%' . $search[0] . '%')->count();
+
+        if ($jenis_dokumen_count == 1) {
+            if (!array_key_exists(1, $search)) {
+                $this->jenis_dokumen = JenisDokumen::where('jenis_dokumen', 'like', '%' . $search[0] . '%')->first();
+            }
+            if (array_key_exists(1, $search)) {
+                $this->jenis_dokumen = JenisDokumen::where('jenis_dokumen', 'like', '%' . $search[0])->orWhere('jenis_dokumen', 'like', "%{$search[0]} {$search[1]}%")->first();
+            }
         }
 
-
-        if (!$this->jenis_dokumen && array_key_exists(1, $search)) {
-            $this->jenis_dokumen = JenisDokumen::where('jenis_dokumen', 'like', "%{$search[0]} {$search[1]}%")->first();
+        if ($jenis_dokumen_count > 1) {
+            if (!array_key_exists(1, $search)) {
+                $this->jenis_dokumen = JenisDokumen::where('jenis_dokumen', 'like', '%' . $search[0] . '%')->first();
+            }
+            if (array_key_exists(1, $search)) {
+                $this->jenis_dokumen = JenisDokumen::where('jenis_dokumen', 'like', "%{$search[0]} {$search[1]}%")->first();
+            }
         }
 
         $this->jenis_dokumen_id = $this->jenis_dokumen ? $this->jenis_dokumen->id : "";
-        if ($nama_dokumen == "") {
-            $this->jenis_dokumen = NULL;
-            $this->jenis_dokumen_id = "";
-        }
     }
 }
