@@ -181,9 +181,14 @@ class ListDocuments extends Component
         $this->nama_dokumen = Str::title($this->nama_dokumen);
         $search = explode(" ", $this->nama_dokumen);
 
-        $this->jenis_dokumen = JenisDokumen::where('jenis_dokumen', 'like', "%{$this->nama_dokumen}%")->first();
+        if (!array_key_exists(1, $search)) {
+            $this->jenis_dokumen = JenisDokumen::where('jenis_dokumen', 'like', '%' . $search[0] . '%')->first();
+        } else {
+            $this->jenis_dokumen = NULL;
+        }
 
-        if (!$this->jenis_dokumen && $search[1]) {
+
+        if (!$this->jenis_dokumen && array_key_exists(1, $search)) {
             $this->jenis_dokumen = JenisDokumen::where('jenis_dokumen', 'like', "%{$search[0]} {$search[1]}%")->first();
         }
 

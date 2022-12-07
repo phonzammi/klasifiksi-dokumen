@@ -189,11 +189,17 @@ class ListDocuments extends Component
         $this->nama_dokumen = Str::title($this->nama_dokumen);
         $search = explode(" ", $this->nama_dokumen);
 
-        $this->jenis_dokumen = JenisDokumen::whereHas('roles_can_upload', function ($query) {
-            $query->where('role_id', auth()->user()->role_id);
-        })->where('jenis_dokumen', 'like', "%{$this->nama_dokumen}%")->first();
+        // dd(!array_key_exists(1, $search));
 
-        if (!$this->jenis_dokumen && $search[1]) {
+        if (!array_key_exists(1, $search)) {
+            $this->jenis_dokumen = JenisDokumen::whereHas('roles_can_upload', function ($query) {
+                $query->where('role_id', auth()->user()->role_id);
+            })->where('jenis_dokumen', 'like', '%' . $search[0] . '%')->first();
+        } else {
+            $this->jenis_dokumen = NULL;
+        }
+
+        if (!$this->jenis_dokumen && array_key_exists(1, $search)) {
             $this->jenis_dokumen = JenisDokumen::whereHas('roles_can_upload', function ($query) {
                 $query->where('role_id', auth()->user()->role_id);
             })->where('jenis_dokumen', 'like', '%' . $search[0] . " " . $search[1] . '%')->first();
