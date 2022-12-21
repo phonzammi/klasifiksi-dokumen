@@ -4,6 +4,7 @@ namespace App\Http\Livewire\Users\Documents;
 
 use App\Models\Dokumen;
 use App\Models\JenisDokumen;
+use Carbon\Carbon;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -47,7 +48,7 @@ class ListDocuments extends Component
         $this->validateOnly($fields, [
             'nama_dokumen' => ['required', Rule::unique('dokumen')->ignore($this->dokumenModel)],
             'jenis_dokumen_id' => 'required|numeric',
-            'lampiran' => [Rule::requiredIf(!$this->dokumenModel), 'nullable', 'mimes:pdf', 'max:2048'],
+            'lampiran' => [Rule::requiredIf(!$this->dokumenModel), 'nullable', 'mimes:pdf,doc,docx,xls,xlsx', 'max:2048'],
         ]);
     }
 
@@ -78,14 +79,15 @@ class ListDocuments extends Component
         $validated = $this->validate([
             'nama_dokumen' => 'required|unique:dokumen,nama_dokumen',
             'jenis_dokumen_id' => 'required|numeric',
-            'lampiran' => 'required|mimes:pdf|max:2048'
+            'lampiran' => 'required|mimes:pdf,doc,docx,xls,xlsx|max:2048'
         ]);
 
         // $jenis_dokumen = JenisDokumen::find($validated['jenis_dokumen_id']);
 
         $this->authorize('create', $this->jenis_dokumen);
 
-        $nama_lampiran = Str::slug($validated['nama_dokumen']) . "." . $this->lampiran->extension();
+        // $nama_lampiran = Str::slug($validated['nama_dokumen']) . "." . $this->lampiran->extension();
+        $nama_lampiran = Str::slug($validated['nama_dokumen']) . "_" . Carbon::now()->format('Y-m-d_h-i') . "." . $this->lampiran->extension();
 
         $dokumen_baru = new Dokumen();
         $dokumen_baru->nama_dokumen = $validated['nama_dokumen'];
@@ -94,7 +96,8 @@ class ListDocuments extends Component
         $dokumen_baru->lampiran = $nama_lampiran;
 
         if ($dokumen_baru->save()) {
-            $this->lampiran->storeAs("lampiran/{$this->jenis_dokumen->jenis_dokumen}", $nama_lampiran, 'public');
+            // $this->lampiran->storeAs("lampiran/{$this->jenis_dokumen->jenis_dokumen}", $nama_lampiran, 'public');
+            $this->lampiran->storeAs("lampiran/", $nama_lampiran, 'public');
         };
 
         session()->flash('message', "Dokumen Baru : '{$dokumen_baru->nama_dokumen}' Berhasil Di Upload !");
@@ -122,30 +125,34 @@ class ListDocuments extends Component
         $validatedData = $this->validate([
             'nama_dokumen' => ['required', Rule::unique('dokumen')->ignore($this->dokumenModel)],
             'jenis_dokumen_id' => 'required|numeric',
-            'lampiran' => [Rule::requiredIf(!$this->dokumenModel), 'nullable', 'mimes:pdf', 'max:2048'],
+            'lampiran' => [Rule::requiredIf(!$this->dokumenModel), 'nullable', 'mimes:pdf,doc,docx,xls,xlsx', 'max:2048'],
         ]);
 
-        $jenis_dokumen_old = JenisDokumen::find($this->dokumenModel->jenis_dokumen_id);
-        $jenis_dokumen_new = JenisDokumen::find($validatedData['jenis_dokumen_id']);
+        // $jenis_dokumen_old = JenisDokumen::find($this->dokumenModel->jenis_dokumen_id);
+        // $jenis_dokumen_new = JenisDokumen::find($validatedData['jenis_dokumen_id']);
 
-        if ($validatedData['jenis_dokumen_id'] != $this->dokumenModel->jenis_dokumen_id && !$this->lampiran) {
-            Storage::disk("public")->move("lampiran/{$jenis_dokumen_old->jenis_dokumen}/{$this->dokumenModel->lampiran}", "lampiran/{$jenis_dokumen_new->jenis_dokumen}/{$this->dokumenModel->lampiran}");
-        }
+        // if ($validatedData['jenis_dokumen_id'] != $this->dokumenModel->jenis_dokumen_id && !$this->lampiran) {
+        //     Storage::disk("public")->move("lampiran/{$jenis_dokumen_old->jenis_dokumen}/{$this->dokumenModel->lampiran}", "lampiran/{$jenis_dokumen_new->jenis_dokumen}/{$this->dokumenModel->lampiran}");
+        // }
 
         $this->dokumenModel->nama_dokumen = $validatedData['nama_dokumen'];
-        $this->dokumenModel->jenis_dokumen_id = $jenis_dokumen_new->id;
+        // $this->dokumenModel->jenis_dokumen_id = $jenis_dokumen_new->id;
 
         if ($this->lampiran) {
             if ($this->lampiran != $this->dokumenModel->lampiran) {
-                Storage::disk("public")->delete("lampiran/{$jenis_dokumen_old->jenis_dokumen}/{$this->dokumenModel->lampiran}");
+                // Storage::disk("public")->delete("lampiran/{$jenis_dokumen_old->jenis_dokumen}/{$this->dokumenModel->lampiran}");
+                Storage::disk("public")->delete("lampiran/{$this->dokumenModel->lampiran}");
             }
-            $nama_lampiran = Str::slug($validatedData['nama_dokumen']) . "." . $this->lampiran->extension();
+            // $nama_lampiran = Str::slug($validatedData['nama_dokumen']) . "." . $this->lampiran->extension();
+            $nama_lampiran = Str::slug($validatedData['nama_dokumen']) . "_" . Carbon::now()->format('Y-m-d_h-i') . "." . $this->lampiran->extension();
             $this->dokumenModel->lampiran = $nama_lampiran;
         }
 
         if ($this->dokumenModel->save()) {
             if ($this->lampiran) {
-                $this->lampiran->storeAs("lampiran/{$jenis_dokumen_new->jenis_dokumen}", $nama_lampiran, 'public');
+                $nama_lampiran = Str::slug($validatedData['nama_dokumen']) . "_" . Carbon::now()->format('Y-m-d_h-i') . "." . $this->lampiran->extension();
+                // $this->lampiran->storeAs("lampiran/{$jenis_dokumen_new->jenis_dokumen}", $nama_lampiran, 'public');
+                $this->lampiran->storeAs("lampiran/", $nama_lampiran, 'public');
             }
         }
 
@@ -171,7 +178,8 @@ class ListDocuments extends Component
         $jenis_dokumen = JenisDokumen::find($this->dokumenModel->jenis_dokumen_id);
 
         if ($this->dokumenModel->delete()) {
-            Storage::disk("public")->delete("lampiran/{$jenis_dokumen->jenis_dokumen}/{$this->dokumenModel->lampiran}");
+            // Storage::disk("public")->delete("lampiran/{$jenis_dokumen->jenis_dokumen}/{$this->dokumenModel->lampiran}");
+            Storage::disk("public")->delete("lampiran/{$this->dokumenModel->lampiran}");
         };
         session()->flash('message', "Dokumen {$this->dokumenModel->nama_dokumen} Berhasil Dihapus !");
         $this->emit('refreshDatatable');

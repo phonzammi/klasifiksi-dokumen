@@ -12,30 +12,33 @@
     </x-slot>
 
     <div class="container-fluid">
-        {{-- @if (session()->has('message'))
-            <div class="alert alert-success alert-dismissible fade show" role="alert">
-                <strong><i class="fa fa-check-circle mr-1"></i> Success!</strong> {{ session('message') }}
-                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-        @endif --}}
-
         <div class="row justify-content-center">
             <div class="col">
                 <div class="card border">
-                    <div class="card-header d-flex justify-content-between">
-                        <div class="mr-auto my-auto">
-                            <i class="fas fa-table me-1"></i>
-                            {{ __('Seluruh Dokumen') }}
-                        </div>
-
-                        <div class="my-auto">
-                            <button wire:click="createDocumentModal" class="btn btn-sm btn-primary mr-1"
-                                wire:loading.attr="disabled">
-                                <i class="fas fa-file-upload"></i>
-                                Unggah Dokumen Baru
-                            </button>
+                    <div class="card-header">
+                        <div class="row d-flex justify-content-between">
+                            <div class="col-md-8 col-sm-6 my-auto">
+                                <i class="fas fa-table me-1"></i>
+                                {{ __('Seluruh Dokumen') }}
+                            </div>
+                            <div class="col-md-4 col-sm-6">
+                                <div class="row d-flex justify-content-between ">
+                                    <div class="col-6">
+                                        <button class="btn btn-sm btn-success text-nowrap"
+                                            wire:click='klasifikasiJenisDokumen'>
+                                            <i class="fas fa-sync mr-1"></i>
+                                            Klasifikasi Jenis Dokumen
+                                        </button>
+                                    </div>
+                                    <div class="col-6">
+                                        <button class="btn btn-sm btn-primary text-nowrap"
+                                            wire:click="createDocumentModal">
+                                            <i class="fas fa-file-upload mr-1"></i>
+                                            Unggah Dokumen Baru
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
@@ -79,42 +82,6 @@
             </div>
 
             <div class="form-group">
-                <x-jet-label for="jenis_dokumen_id">
-                    Jenis Dokumen
-                </x-jet-label>
-                @if ($nama_dokumen == '')
-                    <x-jet-input type='text'
-                        class="bg-white fst-normal {{ $errors->has('nama_dokumen') ? 'is-invalid' : '' }}"
-                        placeholder="{{ __('Isi Nama Dokumen Terlebih Dahulu ...') }}" readonly />
-                @elseif(!$nama_dokumen == '' && !is_null($jenis_dokumen))
-                    <x-jet-input type='hidden' wire:model.debounce.500ms='jenis_dokumen_id' />
-                    <x-jet-input type='text' class="border border-success bg-white fw-bold"
-                        placeholder="{{ $jenis_dokumen->jenis_dokumen }}" readonly />
-                @elseif ($nama_dokumen && is_null($jenis_dokumen))
-                    <x-jet-input style="color: red" type='text'
-                        class="border border-danger bg-white fst-normal is-invalid"
-                        value="{{ __('Jenis Dokumen Tidak Tersedia/Tidak Berwenang') }}" readonly />
-                @endif
-
-                <x-jet-input-error for="jenis_dokumen_id" class="mt-2" />
-            </div>
-
-            {{-- <div class="form-group">
-                <x-jet-label for="jenis_dokumen_id">
-                    Jenis Dokumen
-                </x-jet-label>
-                <select id="jenis_dokumen_id" wire:model.lazy="jenis_dokumen_id"
-                    class="custom-select {{ $errors->has('jenis_dokumen_id') ? 'is-invalid' : '' }}">
-                    <option value="">Pilih Jenis Dokumen ...</option>
-                    @foreach ($semua_jenis_dokumen as $jenis_dokumen)
-                        <option value="{{ $jenis_dokumen->id }}">{{ $jenis_dokumen->jenis_dokumen }}</option>
-                    @endforeach
-                </select>
-
-                <x-jet-input-error for="jenis_dokumen_id" class="mt-2" />
-            </div> --}}
-
-            <div class="form-group">
                 <x-jet-label for="lampiran">
                     Pilih Lampiran
                     @if ($isEditing)
@@ -124,7 +91,8 @@
                 <div class="custom-file">
                     {{-- <input type="file" class="custom-file-input" id="customFile"> --}}
                     <x-jet-input type='file' wire:model.debounce.500ms="lampiran" id="customFile"
-                        class="custom-file-input {{ $errors->has('lampiran') ? 'is-invalid' : '' }}" accept=".pdf" />
+                        class="custom-file-input {{ $errors->has('lampiran') ? 'is-invalid' : '' }}"
+                        accept=".pdf,.doc,.docx,.xls,.xlsx" />
                     <label class="custom-file-label"
                         for="customFile">{{ $lampiran ? $lampiran->getClientOriginalName() : 'Pilih Lampiran' }}</label>
                     <x-jet-input-error for="lampiran" class="mt-2" />

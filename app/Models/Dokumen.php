@@ -30,7 +30,7 @@ class Dokumen extends Model
 
     public function getLampiranUrlAttribute()
     {
-        $lampiran_url = Storage::disk(config('public'))->url("lampiran/{$this->jenis_dokumen}/{$this->lampiran}");
+        $lampiran_url = Storage::disk(config('public'))->url("lampiran/{$this->lampiran}");
         return $lampiran_url;
     }
 

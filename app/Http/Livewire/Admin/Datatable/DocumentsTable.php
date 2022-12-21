@@ -36,7 +36,10 @@ class DocumentsTable extends DataTableComponent
                 ->sortable(
                     fn (Builder $query, string $direction) => $query->orderBy('jenis_dokumen.jenis_dokumen', $direction)
                 )
-                ->searchable(),
+                ->searchable()
+                ->format(
+                    fn ($value, $row, Column $column) => $row["jenis_dokumen.jenis_dokumen"] ? $row["jenis_dokumen.jenis_dokumen"] : '<span class="badge badge-danger">Tidak Tersedia</span>'
+                )->html(),
             Column::make("Diunggah Oleh", "uploaded_by.name")
                 ->sortable(
                     fn (Builder $query, string $direction) => $query->orderBy('users.name', $direction)
