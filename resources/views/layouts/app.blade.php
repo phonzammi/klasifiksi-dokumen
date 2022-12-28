@@ -97,6 +97,13 @@
                                         <p>List Jenis Dokumen</p>
                                     </a>
                                 </li>
+                                <li class="nav-item">
+                                    <a href="{{ route('admin.documents.klasifikasi-knn') }}"
+                                        class="nav-link {{ request()->routeIs('admin.documents.klasifikasi-knn') ? 'active' : '' }}">
+                                        <i class="fas fa-window-restore nav-icon"></i>
+                                        <p>Klasifikasi KNN</p>
+                                    </a>
+                                </li>
                             </ul>
                         </li>
 

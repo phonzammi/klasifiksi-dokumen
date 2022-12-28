@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\DashboardController;
+use App\Http\Livewire\Admin\Documents\KlasifikasiKNN\Klasifikasi;
 use App\Http\Livewire\Admin\Documents\ListDocuments as AdminListDocuments;
 use App\Http\Livewire\Users\Documents\ListDocuments as UsersListDocuments;
 use App\Http\Livewire\Admin\Documents\ListJenisDocument;
@@ -41,6 +42,7 @@ Route::middleware([
         Route::prefix('documents')->group(function () {
             Route::get('/', AdminListDocuments::class)->name('documents.index');
             Route::get('jenis', ListJenisDocument::class)->name('documents.jenis');
+            Route::get('klasifikasi-knn', Klasifikasi::class)->name('documents.klasifikasi-knn');
         });
         Route::get('hak-akses', ListRoles::class)->name('roles');
     });

@@ -29,7 +29,7 @@ class ListDocuments extends Component
     // protected $rules = [
     //     'nama_dokumen' => 'required|unique:dokumen,nama_dokumen',
     //     'jenis_dokumen_id' => 'required|numeric',
-    //     'lampiran' => 'required|mimes:pdf,xls,docx|max:2048'
+    //     'lampiran' => 'required|mimes:pdf,doc,docx,xls,xlsx|max:2048'
     // ];
 
     protected $validationAttributes = [
@@ -48,7 +48,7 @@ class ListDocuments extends Component
         $this->validateOnly($fields, [
             'nama_dokumen' => ['required', Rule::unique('dokumen')->ignore($this->dokumenModel)],
             // 'jenis_dokumen_id' => 'required|numeric',
-            'lampiran' => [Rule::requiredIf(!$this->dokumenModel), 'mimes:pdf,xls,docx', 'max:2048'],
+            'lampiran' => [Rule::requiredIf(!$this->dokumenModel), 'mimes:pdf,doc,docx,xls,xlsx', 'max:2048'],
         ]);
     }
 
@@ -74,7 +74,7 @@ class ListDocuments extends Component
         $validatedData = $this->validate([
             'nama_dokumen' => 'required|unique:dokumen,nama_dokumen',
             // 'jenis_dokumen_id' => 'required|numeric',
-            'lampiran' => 'required|mimes:pdf,xls,docx|max:2048'
+            'lampiran' => 'required|mimes:pdf,doc,docx,xls,xlsx|max:2048'
         ]);
 
         // $jenis_dokumen = JenisDokumen::find($validatedData['jenis_dokumen_id']);
@@ -111,7 +111,7 @@ class ListDocuments extends Component
         $validatedData = $this->validate([
             'nama_dokumen' => 'required|unique:dokumen,nama_dokumen,' . $this->dokumenModel->id,
             // 'jenis_dokumen_id' => 'required|numeric',
-            'lampiran' => [Rule::requiredIf(!$this->dokumenModel), 'nullable', 'mimes:pdf,xls,docx', 'max:2048'],
+            'lampiran' => [Rule::requiredIf(!$this->dokumenModel), 'nullable', 'mimes:pdf,doc,docx,xls,xlsx', 'max:2048'],
         ]);
 
         // $jenis_dokumen_old = JenisDokumen::find($this->dokumenModel->jenis_dokumen_id);
